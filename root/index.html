@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+    <head>
+        <title>AlekEagle ShareX Server</title>
+        <meta name="theme-color" content="#3a3a3a">
+        <link rel="shortcut icon" href="https://i.alekeagle.com/favicon.ico" type="image/x-icon" />
+        <meta property="og:title" content="AlekEagle ShareX Server">
+        <meta property="og:description" content="AlekEagle ShareX Server" />
+        <meta property="og:image" content="https://i.alekeagle.com/assets/images/me_irl.png">
+        <meta name="viewport" content="width=0.7,initial-scale=0.7">
+        <link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet" type="text/css">
+        <link href="assets/css/universal.css" rel="stylesheet" type="text/css">
+        <!-- 
+        <canvas id="bgCanvas"></canvas>
+        <script type="text/javascript" src="assets/js/classical-noise.js"></script>
+        <script type="text/javascript" src="assets/js/bgAnimation.js"></script> -->
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'UA-135044771-1');
+        </script>
+        <script>
+            function createPopup(url, menu) {
+                popupWindow = window.open(url, 'popUpWindow',
+                    `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
+                )
+            }
+        </script>
+    </head>
+
+    <body>
+        <header class="header">
+            <div class="header__inner">
+                <a href="/">
+                    <img class="header__logo" src="/assets/images/me_irl.png" style="border-radius: 50%;height: 90px;"
+                        alt="AlekEagle">
+                    <h1 class="header__title">
+                        AlekEagle ShareX Server
+                    </h1>
+                </a>
+                <br><a href="/me/"><button class="button header_button">My Dashboard</button></a><a
+                    href="https://alekeagle.com"><button class="button header_button">Learn more about the
+                        dev</button></a>
+            </div>
+        </header>
+        <div class="under_header"></div>
+        <p class="subtitle">A Server that can host your ShareX uploads</p>
+        <div class="projects">
+            <div class="project float">
+                <img class="project_icon" src="/assets/images/bulletpoint.png" alt="bulletpoint">
+                <div class="project_title">Easy and Free</div>
+                <div class="project_description">Super easy to use and configure, all you need is an account.</div>
+            </div>
+            <div class="project float">
+                <img class="project_icon" src="/assets/images/bulletpoint.png" alt="bulletpoint">
+                <div class="project_title">Wide support</div>
+                <div class="project_description">Not just screenshots, just about any file type (with a few exceptions)
+                </div>
+            </div>
+            <div class="project float">
+                <img class="project_icon" src="/assets/images/bulletpoint.png" alt="bulletpoint">
+                <div class="project_title">Fast and Secure</div>
+                <div class="project_description">Without the link to the file, it's almost impossible to get your
+                    uploads.</div>
+            </div>
+            <div class="project float">
+                <img class="project_icon" src="/assets/images/bulletpoint.png" alt="bulletpoint">
+                <div class="project_title">More features coming soon</div>
+                <div class="project_description">Manage your files you've uploaded, and much more!</div>
+            </div>
+            <a href="mailto:contact@alekeagle.com">
+                <div class="project float">
+                    <img class="project_icon" src="/assets/images/me_irl.png">
+                    <div class="project_title">Contact me</div>
+                    <div class="project_description">If you have any questions feel free to email me.</div>
+                </div>
+            </a>
+        </div>
+        <div class="footer_box">
+            <a href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>
+        </div>
+    </body>
+
+</html>

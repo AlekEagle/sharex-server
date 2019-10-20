@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+    <head>
+        <title>AlekEagle ShareX User Dashboard</title>
+        <meta name="theme-color" content="#3a3a3a">
+        <link rel="shortcut icon" href="https://i.alekeagle.com/favicon.ico" type="image/x-icon" />
+        <meta property="og:title" content="AlekEagle ShareX User Dashboard">
+        <meta property="og:description" content="AlekEagle ShareX User Dashboard" />
+        <meta property="og:image" content="https://i.alekeagle.com/assets/images/me_irl.png">
+        <meta name="viewport" content="width=0.7,initial-scale=0.7">
+        <link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet" type="text/css">
+        <link href="/assets/css/universal.css" rel="stylesheet" type="text/css">
+        <!-- 
+        <canvas id="bgCanvas"></canvas>
+        <script type="text/javascript" src="assets/js/classical-noise.js"></script>
+        <script type="text/javascript" src="assets/js/bgAnimation.js"></script> -->
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'UA-135044771-1');
+        </script>
+        <script>
+            function createPopup(url, menu) {
+                popupWindow = window.open(url, 'popUpWindow',
+                    `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
+                )
+            }
+
+            function logout() {
+                fetch('/api/user/logout/', {
+                    credentials: "include"
+                }).then(res => {
+                    if (res.status === 200) {
+                        document.location.href =
+                            `${document.location.protocol}//${document.location.host}/`;
+                        return;
+                    } else {
+                        alert(
+                            'There was an error in logging you out, please contact AlekEagle via email, or discord.'
+                        );
+                    }
+                });
+            }
+
+            function init() {
+                fetch('/api/authenticate/', {
+                    credentials: 'include'
+                }).then(res => {
+                    if (res.status !== 200) {
+                        document.location.href =
+                            `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
+                        return;
+                    }
+                });
+
+            }
+            document.addEventListener('readystatechange', e => {
+                if (document.readyState === 'interactive') {
+                    init();
+                }
+            })
+        </script>
+    </head>
+
+    <body>
+        <header class="header">
+            <div class="header__inner">
+                <a href="/">
+                    <img class="header__logo" src="/assets/images/me_irl.png" style="border-radius: 50%;height: 90px;"
+                        alt="AlekEagle">
+                    <h1 class="header__title">
+                        Getting Started
+                    </h1>
+                </a>
+                <br><a href="/me/"><button class="button header_button">Back</button></a </div> </header> <div
+                    class="under_header"></div>
+            <p id="subtitle" class="subtitle">Easier than tying your shoes.</p>
+            </p>
+            <div class="projects">
+                <a href="/api/user/save?type=sharex" target="_blank">
+                    <div class="project float">
+                        <img class="project_icon" src="/assets/images/bulletpoint.png" alt="bulletpoint">
+                        <div class="project_title">Step 1</div>
+                        <div class="project_description">Click here to download the configuration file.</div>
+                    </div>
+                </a>
+                <div class="project float">
+                    <img class="project_icon" src="/assets/images/bulletpoint.png" alt="bulletpoint">
+                    <div class="project_title">Step 2</div>
+                    <div class="project_description">Open the configuration file.</div>
+                </div>
+                <div class="project float">
+                    <img class="project_icon" src="/assets/images/bulletpoint.png" alt="bulletpoint">
+                    <div class="project_title">Step 3</div>
+                    <div class="project_description">Click "yes" on the pop-up that appears from ShareX.</div>
+                </div>
+                <div class="project float">
+                    <img class="project_icon" src="/assets/images/bulletpoint.png" alt="bulletpoint">
+                    <div class="project_title">All Done!</div>
+                    <div class="project_description">You can immediately start uploading files with ShareX after the
+                        final step!</div>
+                </div>
+            </div>
+            <div class="footer_box">
+                <a href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>
+            </div>
+    </body>
+
+</html>

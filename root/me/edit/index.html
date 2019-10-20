@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+    <head>
+        <title>AlekEagle ShareX User Dashboard</title>
+        <meta name="theme-color" content="#3a3a3a">
+        <link rel="shortcut icon" href="https://i.alekeagle.com/favicon.ico" type="image/x-icon" />
+        <meta property="og:title" content="AlekEagle ShareX User Dashboard">
+        <meta property="og:description" content="AlekEagle ShareX User Dashboard" />
+        <meta property="og:image" content="https://i.alekeagle.com/assets/images/me_irl.png">
+        <meta name="viewport" content="width=0.7,initial-scale=0.7">
+        <link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet" type="text/css">
+        <link href="/assets/css/universal.css" rel="stylesheet" type="text/css">
+        <!-- 
+        <canvas id="bgCanvas"></canvas>
+        <script type="text/javascript" src="assets/js/classical-noise.js"></script>
+        <script type="text/javascript" src="assets/js/bgAnimation.js"></script> -->
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'UA-135044771-1');
+        </script>
+        <script>
+            function createPopup(url, menu) {
+                popupWindow = window.open(url, 'popUpWindow',
+                    `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
+                )
+            }
+
+            function init() {
+                fetch('/api/authenticate/', {
+                    credentials: 'include'
+                }).then(res => {
+                    if (res.status !== 200) {
+                        document.location.href =
+                            `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
+                        return;
+                    } else {
+                        fetch('/api/self/', {
+                            credentials: 'include'
+                        }).then(res => res.json()).then(json => {
+                            document.getElementById('info').innerHTML =
+                                `Username: ${json.displayName}<br>Email: ${json.email}<br>Password: No Peeking!`;
+                        });
+                    }
+                });
+
+                function editSelf(e) {
+                    if (e.key !== 'Enter' && e.type !== 'click') return;
+                    fetch('/api/user/update/', {
+                        credentials: 'include',
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            password: document.getElementById('password_edit').value,
+                            name: document.getElementById('username_edit').value,
+                            newPassword: document.getElementById('new_password_edit').value,
+                            email: document.getElementById('email_edit').value
+                        })
+                    }).then(res => {
+                        switch (res.status) {
+                            case 200:
+                                document.location.href =
+                                    `${document.location.protocol}//${document.location.host}/me/`;
+                                return;
+                                break;
+                            case 400:
+                                document.getElementById('edit_err').innerText =
+                                    'Please enter your current password and edit at least one detail.';
+                                break;
+                            case 401:
+                                document.getElementById('edit_err').innerText =
+                                    'You are unauthorized to preform this action. Try signing out and sign back in.';
+                                break;
+                            case 500:
+                                document.getElementById('edit_err').innerText =
+                                    'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
+                        }
+                    });
+                }
+
+                function regen() {
+                    fetch('/api/user/regentoken/', {
+                        credentials: 'include',
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            password: document.getElementById('password_regen').value
+                        })
+                    }).then(res => {
+                        switch(res.status) {
+                            case 201:
+                                res.json().then(json => alert(`Success! Your token has been regenerated! Your new token is: ${json.token}`));
+                                document.location.reload();
+                            break;
+                            case 401:
+                                document.getElementById('regen_err').innerText = 'You are unauthorized to preform this action. Your password might be incorrect, if it isn\'t incorrect, try signing out and sign back in.';
+                            break;
+                            case 500:
+                                document.getElementById('regen_err').innerText = 'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
+                        }
+                    })
+                }
+                document.getElementById('edit').addEventListener('click', editSelf, false);
+                document.getElementById('username_edit').addEventListener('keydown', editSelf, false);
+                document.getElementById('email_edit').addEventListener('keydown', editSelf, false);
+                document.getElementById('password_edit').addEventListener('keydown', editSelf, false);
+                document.getElementById('new_password_edit').addEventListener('keydown', editSelf, false);
+                document.getElementById('regen').addEventListener('click', regen, false);
+                document.getElementById('password_regen').addEventListener('keydown', regen, false);
+            }
+            document.addEventListener('readystatechange', e => {
+                if (document.readyState === 'interactive') {
+                    init();
+                }
+            })
+        </script>
+    </head>
+
+    <body>
+        <header class="header">
+            <div class="header__inner">
+                <a href="/">
+                    <img class="header__logo" src="/assets/images/me_irl.png" style="border-radius: 50%;height: 90px;"
+                        alt="AlekEagle">
+                    <h1 class="header__title">
+                        Edit Your Profile
+                    </h1>
+                </a>
+                <br><a href="/me/"><button class="button header_button">Back</button></a>
+            </div>
+        </header>
+        <div class="under_header"></div>
+        <p id="subtitle" class="subtitle">Edit your profile here. The only field required is your current password. <ul>
+                ONLY FILL OUT WHAT YOU WANT TO EDIT!</ul>
+        </p>
+        </p>
+        <div class="projects">
+            <div class="project float auth">
+                <div class="project_title">Current Info</div>
+                <div id="info" class="project_description"></div>
+            </div>
+            <div class="project float auth">
+                <div class="project_title">Update Your Info</div>
+                <div class="project_description">
+                    <input type="text" name="username" id="username_edit" placeholder="New Username"
+                        class="darktextbox">
+                    <input type="email" name="email" id="email_edit" placeholder="New Email" class="darktextbox">
+                    <input type="password" name="password" id="new_password_edit" placeholder="New Password"
+                        class="darktextbox">
+                    <input type="password" name="password2" id="password_edit" placeholder="Current Password"
+                        class="darktextbox">
+                    <br>
+                    <button id="edit" class="button">Edit Myself</button>
+                    <p id="edit_err" class="error_text"></p>
+                </div>
+            </div>
+            <div class="project float auth">
+                <div class="project_title">Regenerate your API token</div>
+                <div class="project_description">
+                    <p>Regenerating your API token will render your previous token unusable, this is irreversible!</p>
+                    <input type="password" name="password2" id="password_regen" placeholder="Current Password"
+                        class="darktextbox">
+                    <br>
+                    <button id="regen" class="button">Regenerate It!</button>
+                    <p id="regen_err" class="error_text"></p>
+                </div>
+            </div>
+        </div>
+        <div class="footer_box">
+            <a href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>
+        </div>
+    </body>
+
+</html>

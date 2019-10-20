@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+    <head>
+        <title>AlekEagle ShareX User Dashboard</title>
+        <meta name="theme-color" content="#3a3a3a">
+        <link rel="shortcut icon" href="https://i.alekeagle.com/favicon.ico" type="image/x-icon" />
+        <meta property="og:title" content="AlekEagle ShareX User Dashboard">
+        <meta property="og:description" content="AlekEagle ShareX User Dashboard" />
+        <meta property="og:image" content="https://i.alekeagle.com/assets/images/me_irl.png">
+        <meta name="viewport" content="width=0.7,initial-scale=0.7">
+        <link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet" type="text/css">
+        <link href="/assets/css/universal.css" rel="stylesheet" type="text/css">
+        <!-- 
+        <canvas id="bgCanvas"></canvas>
+        <script type="text/javascript" src="assets/js/classical-noise.js"></script>
+        <script type="text/javascript" src="assets/js/bgAnimation.js"></script> -->
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'UA-135044771-1');
+        </script>
+        <script>
+            function createPopup(url, menu) {
+                popupWindow = window.open(url, 'popUpWindow',
+                    `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
+                )
+            }
+
+            function init() {
+                fetch('/api/authenticate/', {
+                    credentials: 'include'
+                }).then(res => {
+                    if (res.status !== 200) {
+                        document.location.href =
+                            `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
+                        return;
+                    }
+                });
+
+            }
+            document.addEventListener('readystatechange', e => {
+                if (document.readyState === 'interactive') {
+                    init();
+                }
+            })
+        </script>
+    </head>
+
+    <body>
+        <header class="header">
+            <div class="header__inner">
+                <a href="/">
+                    <img class="header__logo" src="/assets/images/me_irl.png" style="border-radius: 50%;height: 90px;"
+                        alt="AlekEagle">
+                    <h1 class="header__title">
+                        Getting Started
+                    </h1>
+                </a>
+                <br><a href="/me/"><button class="button header_button">Back</button></a </div> </header> <div
+                    class="under_header"></div>
+            <p id="subtitle" class="subtitle">Quick and easy steps to get started, first, select your platform.</p>
+            </p>
+            <div class="projects">
+                <a href="sharex/">
+                    <div class="project float">
+                        <img class="project_icon" src="/assets/images/bulletpoint.png" alt="bulletpoint">
+                        <div class="project_title">ShareX</div>
+                        <div class="project_description">ShareX AKA Windows, this one is easy for you.</div>
+                    </div>
+                </a>
+                <a href="sharenix/">
+                    <div class="project float">
+                        <img class="project_icon" src="/assets/images/bulletpoint.png" alt="bulletpoint">
+                        <div class="project_title">ShareNiX</div>
+                        <div class="project_description">Pretty much everyone else, this one is a little bit more
+                            tedious, but still easy.</div>
+                    </div>
+                </a>
+                <div class="project float">
+                    <img class="project_icon" src="/assets/images/bulletpoint.png" alt="bulletpoint">
+                    <div class="project_title">Your platform not here?</div>
+                    <div class="project_description">Email me what platform you use so I can see if its compatible!
+                    </div>
+                </div>
+            </div>
+            <div class="footer_box">
+                <a href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>
+            </div>
+    </body>
+
+</html>
