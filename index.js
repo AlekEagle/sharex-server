@@ -320,10 +320,6 @@ app.put('/api/user/update/', (req, res) => {
 app.delete('/api/user/delete/', (req, res) => {
     authenticate(req, res).then(() => {
         let { password, id } = req.body;
-        if (!password || !id) {
-            res.sendStatus(400);
-            return;
-        }
         if (id) {
             if (req.session.user.staff === '') {
                 res.sendStatus(401);
@@ -343,7 +339,7 @@ app.delete('/api/user/delete/', (req, res) => {
                     }
                 });
             }
-        } else {
+        }else if (password) {
             if (!req.session.user) {
                 res.sendStatus(401);
                 return;
@@ -385,6 +381,9 @@ app.delete('/api/user/delete/', (req, res) => {
                     console.error(err);
                 });
             }
+        }else {
+            res.sendStatus(400);
+            return;
         }
     }).catch(() => {
         res.sendStatus(401);
