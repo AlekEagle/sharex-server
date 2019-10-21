@@ -198,7 +198,7 @@ app.post('/api/user/create/', (req, res) => {
         }).then(u => {
             if (u === null) {
                 let now = new Date(Date.now());
-                let part1 = new Buffer.from(now.getTime());
+                let part1 = new Buffer.from(now.getTime().toString());
                 let part2 = new Buffer.from(new Date(Date.now()).toISOString());
                 bcrypt.hash(password, Math.floor(Math.random() * 10)).then(hashedPass => {
                     user.create({ id: now.getTime(), username, domain: 'alekeagle.com', subdomain: 'i', displayName: name, email, createdAt: now, updatedAt: now, password: hashedPass, staff: '', apiToken: `${part1.toString('base64').replace(/==/g, '')}.${part2.toString('base64')}` }).then(newUser => {
@@ -505,11 +505,11 @@ app.get('/api/user/save/', (req, res) => {
         switch(req.query.type) {
             case 'sharex':
                 res.set('Content-Disposition', 'attachment; filename="ShareX_Uploader.sxcu"');
-                res.status(201).send(`{"Version": "12.4.1","Name": "AlekEagle ShareX Uploader","DestinationType": "ImageUploader, TextUploader, FileUploader","RequestMethod": "POST","RequestURL": "https://i.alekeagle.com/upload","Headers": {"Authorization": "${req.session.user.apiToken}"},"Body": "MultipartFormData","FileFormName": "file"}`);
+                res.status(200).send(`{"Version": "12.4.1","Name": "AlekEagle ShareX Uploader","DestinationType": "ImageUploader, TextUploader, FileUploader","RequestMethod": "POST","RequestURL": "https://i.alekeagle.com/upload","Headers": {"Authorization": "${req.session.user.apiToken}"},"Body": "MultipartFormData","FileFormName": "file"}`);
             break;
             case 'sharenix':
                 res.set('Content-Disposition', 'attachment; filename="ShareNiX_Uploader.json"');
-                res.status(201).send(`{"Name": "AlekEagle ShareNiX Uploader","RequestType": "POST","Headers": {"Authorization": "${req.session.user.apiToken}"},"RequestURL": "https://i.alekeagle.com/upload","FileFormName": "file","ResponseType": "Text"}`);
+                res.status(200).send(`{"Name": "AlekEagle ShareNiX Uploader","RequestType": "POST","Headers": {"Authorization": "${req.session.user.apiToken}"},"RequestURL": "https://i.alekeagle.com/upload","FileFormName": "file","ResponseType": "Text"}`);
             break;
             default:
                 res.sendStatus(404);
