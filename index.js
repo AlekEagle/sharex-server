@@ -334,6 +334,7 @@ app.delete('/api/user/delete/', (req, res) => {
                         u.destroy().then(() => {
                             actions.create({ type: 4, by: req.session.user.id, to: id }).then(() => {
                                 console.log('User Deleted');
+                                res.sendStatus(200);
                             });
                         });
                     }
@@ -514,6 +515,49 @@ app.get('/api/user/save/', (req, res) => {
                 res.sendStatus(404);
             break;
         }
+    }).catch(() => {
+        res.sendStatus(401);
+    });
+});
+app.get('/api/domains/', (req, res) => {
+    domains.findAll().then(d => {
+        res.status(200).json(d);
+    });
+});
+app.patch('/api/user/domain/', (req, res) => {
+    authenticate(req, res).then(() => {
+        let { domain, subdomain } = req.body;
+        domains.findOne({
+            where: {
+                domain
+            }
+        }).then(d => {
+            if (d !== null) {
+                if (d.subdomains.includes(subdomain)) {
+                    user.findOne({
+                        where: {
+                            id: req.session.user.id
+                        }
+                    }).then(u => {
+                        if (u !== null) {
+                            u.update({domain, subdomain}).then(u => {
+                                req.session.user = u;
+                                res.sendStatus(200);
+                            });
+                        }
+                    }).catch(() => {
+                        res.sendStatus(500);
+                    });
+                }else {
+                    res.sendStatus(400);
+                }
+            }else {
+                res.sendStatus(400);
+            }
+        }).catch(() => {
+            res.sendStatus(500);
+            return;
+        });
     }).catch(() => {
         res.sendStatus(401);
     });

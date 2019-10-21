@@ -52,6 +52,38 @@
                     }
                 });
 
+                fetch('/api/domains/', {
+                    credentials: "include"
+                }).then(res => res.json()).then(json => {
+                    let subdomain = document.getElementById('subdomain'),
+                    domain = document.getElementById('domain');
+                    json.forEach(e => {
+                        let a = document.createElement('option');
+                        a.text = e.domain;
+                        a.id = e.domain;
+                        domain.options.add(a);
+                    });
+                    fetch('/api/self/', {
+                        credentials: "include"
+                    }).then(res => res.json()).then(js => {
+                        domain.value = js.domain;
+                        fetch('/api/domains/', {
+                            credentials: "include"
+                        }).then(res => res.json()).then(json => {
+                            while (subdomain.options.length) {
+                                subdomain.options.remove(0);
+                            }
+                            json.filter(d => d.domain === domain.value)[0].subdomains.forEach(s => {
+                                let a = document.createElement('option');
+                                a.text = s;
+                                a.id = s;
+                                subdomain.options.add(a);
+                            });
+                            subdomain.value = js.subdomain;
+                        });
+                    });
+                });
+
                 function editSelf(e) {
                     if (e.key !== 'Enter' && e.type !== 'click') return;
                     fetch('/api/user/update/', {
@@ -134,7 +166,47 @@
                             case 500:
                                 document.getElementById('del_err').innerText = 'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
                         }
+                    });
+                }
+                function updateDomains(e) {
+                    if (e.key !== 'Enter' && e.type !== 'click') return;
+                    fetch('/api/user/domain/', {
+                        credentials: "include",
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            domain: document.getElementById('domain').value,
+                            subdomain: document.getElementById('subdomain').value
+                        })
+                    }).then(res => {
+                        switch(res.status) {
+                            case 200:
+                                alert(`Tada! Your new domain and subdomain combination is "${document.getElementById('subdomain').value}.${document.getElementById('domain').value}"!`);
+                                document.location.reload();
+                            break;
+                            case 500:
+                                document.getElementById('domain_err').innerText = 'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
+                        }
                     })
+                }
+                function showSubdomains() {
+                    let subdomain = document.getElementById('subdomain'),
+                    domain = document.getElementById('domain');
+                    fetch('/api/domains/', {
+                    credentials: "include"
+                }).then(res => res.json()).then(json => {
+                    while (subdomain.options.length) {
+                        subdomain.options.remove(0);
+                    }
+                    json.filter(d => d.domain === domain.value)[0].subdomains.forEach(s => {
+                        let a = document.createElement('option');
+                        a.text = s;
+                        a.id = s;
+                        subdomain.options.add(a);
+                    });
+                });
                 }
                 document.getElementById('edit').addEventListener('click', editSelf, false);
                 document.getElementById('username_edit').addEventListener('keydown', editSelf, false);
@@ -145,6 +217,9 @@
                 document.getElementById('password_regen').addEventListener('keydown', regen, false);
                 document.getElementById('del').addEventListener('click', delAcc, false);
                 document.getElementById('password_del').addEventListener('keydown', delAcc, false);
+                document.getElementById('domain').addEventListener('change', showSubdomains, false);
+                document.getElementById('domain_sel').addEventListener('click', updateDomains, false);
+
             }
             document.addEventListener('readystatechange', e => {
                 if (document.readyState === 'interactive') {
@@ -170,7 +245,6 @@
         <div class="under_header"></div>
         <p id="subtitle" class="subtitle">Edit your profile here. The only field required is your current password. <b>
                 ONLY FILL OUT WHAT YOU WANT TO EDIT!</b>
-        </p>
         </p>
         <div class="projects">
             <div class="project float auth">
@@ -209,8 +283,17 @@
                     <input type="password" name="password2" id="password_del" maxlength="20" placeholder="Current Password"
                         class="darktextbox">
                     <br>
-                    <button id="del" class="button">I'm Sure, Delete it.</button>
+                    <button id="del" class="button">I'm Sure, Delete it</button>
                     <p id="del_err" class="error_text"></p>
+                </div>
+            </div>
+            <div class="project float auth">
+                <div class="project_title">Domain and Subdomain</div>
+                <div class="project_description"><p>Choose your favorite domain and subdomain options! If you want more subdomains for a specific domain email AlekEagle.</p>
+                    <select id="subdomain"></select>.<select id="domain"></select>
+                    <br>
+                    <button id="domain_sel" class="button">I want that one</button>
+                    <p id="domain_err" class="error_text"></p>
                 </div>
             </div>
         </div>
