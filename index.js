@@ -228,7 +228,7 @@ app.post('/api/user/create/', (req, res) => {
 app.put('/api/user/update/', (req, res) => {
     authenticate(req, res).then(() => {
         let { email, name, password, newPassword, id } = req.body;
-        if (!password && !(email || name || newPassword)) {
+        if (!(email || name || newPassword)) {
             res.sendStatus(400);
             return;
         } else {
@@ -269,6 +269,10 @@ app.put('/api/user/update/', (req, res) => {
                     });
                 }
             } else {
+                if (!password) {
+                    res.sendStatus(400);
+                    return;
+                }
                 if (req.session.user) {
                     user.findOne({
                         where: {
@@ -367,7 +371,8 @@ app.delete('/api/user/delete/', (req, res) => {
                                     console.error(err);
                                 });
                             } else {
-                                res.sendStatus(401);
+                                res.sendStatus(400);
+                                return;
                             }
                         }), err => {
                             res.sendStatus(500);

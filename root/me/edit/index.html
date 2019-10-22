@@ -163,6 +163,12 @@
                                 alert('And it\'s done, we\'re sad to see you go.');
                                 document.location.reload();
                             break;
+                            case 401:
+                                document.getElementById('del_err').innerText = 'Your session is invalid, log in again.';
+                            break;
+                            case 400:
+                                document.getElementById('del_err').innerText = 'Your password is incorrect, please try again.';
+                            break;
                             case 500:
                                 document.getElementById('del_err').innerText = 'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
                         }
