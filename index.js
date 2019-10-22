@@ -78,8 +78,7 @@ actions.sync({ force: false }).then(() => {
 });
 class domains extends Sequelize.Model {};
 domains.init({
-    domain: {type: Sequelize.STRING, primaryKey: true},
-    subdomains: Sequelize.JSON
+    domain: {type: Sequelize.STRING, primaryKey: true}
 }, { sequelize });
 domains.sync({ force: false }).then(() => {
     console.log('Domains synced to database successfully!');
