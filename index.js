@@ -200,7 +200,7 @@ app.post('/api/user/create/', (req, res) => {
                 let part1 = new Buffer.from(now.getTime().toString());
                 let part2 = new Buffer.from(new Date(Date.now()).toISOString());
                 bcrypt.hash(password, Math.floor(Math.random() * 10)).then(hashedPass => {
-                    user.create({ id: now.getTime(), username, domain: 'alekeagle.com', subdomain: 'i', displayName: name, email, createdAt: now, updatedAt: now, password: hashedPass, staff: '', apiToken: `${part1.toString('base64').replace(/==/g, '')}.${part2.toString('base64')}` }).then(newUser => {
+                    user.create({ id: now.getTime(), username, domain: 'alekeagle.me', subdomain: '', displayName: name, email, createdAt: now, updatedAt: now, password: hashedPass, staff: '', apiToken: `${part1.toString('base64').replace(/==/g, '')}.${part2.toString('base64')}` }).then(newUser => {
                         req.session.user = newUser;
                         res.status(201).json(newUser);
                         actions.create({ type: 1, by: newUser.id, to: newUser.id }).then(() => {
