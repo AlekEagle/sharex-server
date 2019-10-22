@@ -532,30 +532,27 @@ app.get('/api/domains/', (req, res) => {
 app.patch('/api/user/domain/', (req, res) => {
     authenticate(req, res).then(() => {
         let { domain, subdomain } = req.body;
+        subdomain = subdomain.replace(/ /g, '-');
         domains.findOne({
             where: {
                 domain
             }
         }).then(d => {
             if (d !== null) {
-                if (d.subdomains.includes(subdomain)) {
-                    user.findOne({
-                        where: {
-                            id: req.session.user.id
-                        }
-                    }).then(u => {
-                        if (u !== null) {
-                            u.update({domain, subdomain}).then(u => {
-                                req.session.user = u;
-                                res.sendStatus(200);
-                            });
-                        }
-                    }).catch(() => {
-                        res.sendStatus(500);
-                    });
-                }else {
-                    res.sendStatus(400);
-                }
+                user.findOne({
+                    where: {
+                        id: req.session.user.id
+                    }
+                }).then(u => {
+                    if (u !== null) {
+                        u.update({domain, subdomain}).then(u => {
+                            req.session.user = u;
+                            res.sendStatus(200);
+                        });
+                    }
+                }).catch(() => {
+                    res.sendStatus(500);
+                });
             }else {
                 res.sendStatus(400);
             }

@@ -67,20 +67,7 @@
                         credentials: "include"
                     }).then(res => res.json()).then(js => {
                         domain.value = js.domain;
-                        fetch('/api/domains/', {
-                            credentials: "include"
-                        }).then(res => res.json()).then(json => {
-                            while (subdomain.options.length) {
-                                subdomain.options.remove(0);
-                            }
-                            json.filter(d => d.domain === domain.value)[0].subdomains.forEach(s => {
-                                let a = document.createElement('option');
-                                a.text = s;
-                                a.id = s;
-                                subdomain.options.add(a);
-                            });
-                            subdomain.value = js.subdomain;
-                        });
+                        subdomain.value = js.subdomain;
                     });
                 });
 
@@ -189,30 +176,13 @@
                     }).then(res => {
                         switch(res.status) {
                             case 200:
-                                alert(`Tada! Your new domain and subdomain combination is "${document.getElementById('subdomain').value}.${document.getElementById('domain').value}"!`);
+                                alert(`Tada! Your new domain and subdomain combination is "${document.getElementById('subdomain').value.replace(/ /g, '-')}.${document.getElementById('domain').value}"!`);
                                 document.location.reload();
                             break;
                             case 500:
                                 document.getElementById('domain_err').innerText = 'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
                         }
                     })
-                }
-                function showSubdomains() {
-                    let subdomain = document.getElementById('subdomain'),
-                    domain = document.getElementById('domain');
-                    fetch('/api/domains/', {
-                    credentials: "include"
-                }).then(res => res.json()).then(json => {
-                    while (subdomain.options.length) {
-                        subdomain.options.remove(0);
-                    }
-                    json.filter(d => d.domain === domain.value)[0].subdomains.forEach(s => {
-                        let a = document.createElement('option');
-                        a.text = s;
-                        a.id = s;
-                        subdomain.options.add(a);
-                    });
-                });
                 }
                 document.getElementById('edit').addEventListener('click', editSelf, false);
                 document.getElementById('username_edit').addEventListener('keydown', editSelf, false);
@@ -223,7 +193,6 @@
                 document.getElementById('password_regen').addEventListener('keydown', regen, false);
                 document.getElementById('del').addEventListener('click', delAcc, false);
                 document.getElementById('password_del').addEventListener('keydown', delAcc, false);
-                document.getElementById('domain').addEventListener('change', showSubdomains, false);
                 document.getElementById('domain_sel').addEventListener('click', updateDomains, false);
 
             }
@@ -274,8 +243,8 @@
             </div>
             <div class="project float auth">
                 <div class="project_title">Domain and Subdomain</div>
-                <div class="project_description"><p>Choose your favorite domain and subdomain options! If you want more subdomains for a specific domain email AlekEagle.</p>
-                    <select id="subdomain"></select>.<select id="domain"></select>
+                <div class="project_description"><p>Choose your favorite domain and subdomain options!</p>
+                    <input type="text" id="subdomain" class="darktextbox"></input>.<select id="domain"></select>
                     <br>
                     <button id="domain_sel" class="button">I want that one</button>
                     <p id="domain_err" class="error_text"></p>
