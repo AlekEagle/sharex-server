@@ -532,6 +532,10 @@ app.patch('/api/user/domain/', (req, res) => {
     authenticate(req, res).then(() => {
         let { domain, subdomain } = req.body;
         subdomain = subdomain.replace(/ /g, '-');
+        if (domain === 'alekeagle.com' && req.session.user.staff === '') {
+            res.sendStatus(403);
+            return;
+        }
         domains.findOne({
             where: {
                 domain
