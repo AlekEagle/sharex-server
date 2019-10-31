@@ -145,10 +145,16 @@ function authenticate(req, res) {
         }
     });
 }
-app.use((req, res, next) => {
-    res.set({
-        'Cache-Control': 'public, max-age=172800'
-    });
+app.use((req, res, next) => { 
+    if (req.url.startsWith('/me')) {
+        res.set({
+            'Cache-Control': 'no-cache'
+        });
+    }else {
+        res.set({
+            'Cache-Control': 'public, max-age=172800'
+        });
+    }
     if (req.headers.host === 'alekeagle.tk') {
         res.redirect(301, 'https://alekeagle.com' + req.path);
         return;
@@ -553,15 +559,106 @@ app.patch('/api/user/domain/', (req, res) => {
                             res.sendStatus(200);
                         });
                     }
-                }).catch(() => {
+                }).catch(err => {
                     res.sendStatus(500);
+                    console.error(error);
                 });
             }else {
                 res.sendStatus(400);
             }
-        }).catch(() => {
+        }).catch(err => {
             res.sendStatus(500);
-            return;
+            console.error(error);
+        });
+    }).catch(() => {
+        res.sendStatus(401);
+    });
+});
+app.get('/api/user/uploads/', (req, res) => {
+    authenticate(req, res).then(() => {
+        let { id } = req.body,
+        count = req.body.count || 50,
+        offset = req.body.offset || 0;
+        if (!id) {
+            uploads.findAll({
+                where: {
+                    userid: req.session.id
+                }
+            }).then(u => {
+                if (u !== null) {
+                    res.status(200).json(u);
+                }else {
+                    res.sendStatus(204);
+                }
+            });
+        }else {
+            if (req.session.user.staff !== '') {
+                uploads.findAll({
+                    where: {
+                        userid: id
+                    }
+                }).then(u => {
+                    if (u !== null) {
+                        res.status(200).json(u);
+                    }else {
+                        res.sendStatus(204);
+                    }
+                }).catch(err => {
+                    res.sendStatus(500);
+                    console.error(err);
+                });
+            }else {
+                res.sendStatus(401);
+            }
+        }
+    }).catch(() => {
+        res.sendStatus(401);
+    });
+});
+app.delete('/api/user/uploads/delete/', (req, res) => {
+    authenticate(req, res).then(() => {
+        let { name } = req.body;
+        if (!name) {res.sendStatus(400); return;}
+        uploads.findOne({
+            where: {
+                [Op.or]: [
+                    {id: name},
+                    {filename: name}
+                ]
+            }
+        }).then(u => {
+            if (u !== null) {
+                if (u.userid === req.session.user.id) {
+                    fs.unlink(`uploads/${u.filename}`, err => {
+                        if (err) {
+                            res.sendStatus(500);
+                            return;
+                        }else {
+                            res.sendStatus(200);
+                            return;
+                        }
+                    });
+                }else if (req.session.user.staff !== ''){
+                    fs.unlink(`uploads/${u.filename}`, err => {
+                        if (err) {
+                            res.sendStatus(500);
+                            return;
+                        }else {
+                            res.sendStatus(200);
+                            return;
+                        }
+                    });
+                }else {
+                    res.sendStatus(401);
+                    return;
+                }
+            }else {
+                res.sendStatus(404);
+                return;
+            }
+        }).catch(err => {
+            res.sendStatus(500);
+            console.error(err);
         });
     }).catch(() => {
         res.sendStatus(401);
