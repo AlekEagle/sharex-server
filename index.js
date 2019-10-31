@@ -146,7 +146,7 @@ function authenticate(req, res) {
     });
 }
 app.use((req, res, next) => { 
-    if (req.url.startsWith('/me')) {
+    if (req.url.startsWith('/me') || req.url.startsWith('/api')) {
         res.set({
             'Cache-Control': 'no-cache'
         });
