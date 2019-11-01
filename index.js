@@ -664,8 +664,13 @@ app.delete('/api/user/uploads/delete/', (req, res) => {
                             res.sendStatus(500);
                             return;
                         }else {
-                            res.sendStatus(200);
-                            return;
+                            u.destroy().then(() => {
+                                res.sendStatus(200);
+                                return;
+                            }).catch(() => {
+                                res.sendStatus(500);
+                                return;
+                            });
                         }
                     });
                 }else if (req.session.user.staff !== ''){
@@ -674,8 +679,13 @@ app.delete('/api/user/uploads/delete/', (req, res) => {
                             res.sendStatus(500);
                             return;
                         }else {
-                            res.sendStatus(200);
-                            return;
+                            u.destroy().then(() => {
+                                res.sendStatus(200);
+                                return;
+                            }).catch(() => {
+                                res.sendStatus(500);
+                                return;
+                            });
                         }
                     });
                 }else {
