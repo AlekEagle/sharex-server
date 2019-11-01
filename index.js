@@ -577,16 +577,18 @@ app.patch('/api/user/domain/', (req, res) => {
 app.get('/api/user/uploads/', (req, res) => {
     authenticate(req, res).then(() => {
         let { id } = req.query,
-        count = req.query.count || 50,
-        offset = req.query.offset || 0;
+        count = parseInt(req.query.count) || 50,
+        offset = parseInt(req.query.offset) || 0;
         if (!id) {
             uploads.findAll({
+                offset,
+                limit: count,
                 where: {
                     userid: req.session.user.id
                 }
             }).then(u => {
                 if (u !== null) {
-                    res.status(200).json(u.slice(offset, (offset+count) >= u.length ? u.length : offset+count));
+                    res.status(200).json(u);
                 }else {
                     res.sendStatus(204);
                 }
@@ -594,12 +596,14 @@ app.get('/api/user/uploads/', (req, res) => {
         }else {
             if (req.session.user.staff !== '') {
                 uploads.findAll({
+                    offset,
+                    limit: count,
                     where: {
                         userid: id
                     }
                 }).then(u => {
                     if (u.length !== 0) {
-                        res.status(200).json(u.slice(offset, (offset+count) >= u.length ? u.length : offset+count));
+                        res.status(200).json(u);
                     }else {
                         res.sendStatus(404);
                     }
