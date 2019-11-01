@@ -586,7 +586,7 @@ app.get('/api/user/uploads/', (req, res) => {
                 }
             }).then(u => {
                 if (u !== null) {
-                    res.status(200).json(u.slice(offset, count));
+                    res.status(200).json(u.slice(offset, offset+count));
                 }else {
                     res.sendStatus(204);
                 }
