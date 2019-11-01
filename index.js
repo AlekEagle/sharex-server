@@ -586,7 +586,7 @@ app.get('/api/user/uploads/', (req, res) => {
                 }
             }).then(u => {
                 if (u !== null) {
-                    res.status(200).json(u.slice(offset, offset+count));
+                    res.status(200).json(u.slice(offset, (offset+count) >= u.length ? u.length : offset+count));
                 }else {
                     res.sendStatus(204);
                 }
@@ -599,7 +599,7 @@ app.get('/api/user/uploads/', (req, res) => {
                     }
                 }).then(u => {
                     if (u.length !== 0) {
-                        res.status(200).json(u.slice(offset, offset+count));
+                        res.status(200).json(u.slice(offset, (offset+count) >= u.length ? u.length : offset+count));
                     }else {
                         res.sendStatus(404);
                     }
