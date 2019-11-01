@@ -42,9 +42,10 @@
                         document.location.href =
                             `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
                         return;
+                    } else {
+
                     }
                 });
-
             }
             document.addEventListener('readystatechange', e => {
                 if (document.readyState === 'interactive') {
@@ -61,37 +62,17 @@
                     <img class="header__logo" src="/assets/images/me_irl.png" style="border-radius: 50%;height: 90px;"
                         alt="AlekEagle">
                     <h1 class="header__title">
-                        Getting Started
+                        Direct Upload
                     </h1>
                 </a>
                 <br><a href="javascript:history.back()"><button class="button header_button">Back</button></a>
             </div>
         </header>
         <div class="under_header"></div>
-        <p id="subtitle" class="subtitle">Quick and easy steps to get started, first, select your platform.</p>
+        <p id="subtitle" class="subtitle">Upload a file straight from your browser</b>
         </p>
         <div class="projects">
-            <a href="sharex/">
-                <div class="project float">
-                    <img class="project_icon" src="/assets/images/bulletpoint.png" alt="bulletpoint">
-                    <div class="project_title">ShareX</div>
-                    <div class="project_description">ShareX AKA Windows, this one is easy for you.</div>
-                </div>
-            </a>
-            <a href="sharenix/">
-                <div class="project float">
-                    <img class="project_icon" src="/assets/images/bulletpoint.png" alt="bulletpoint">
-                    <div class="project_title">ShareNiX</div>
-                    <div class="project_description">Pretty much everyone else, this one is a little bit more
-                        tedious, but still easy.</div>
-                </div>
-            </a>
-            <div class="project float">
-                <img class="project_icon" src="/assets/images/bulletpoint.png" alt="bulletpoint">
-                <div class="project_title">Your platform not here?</div>
-                <div class="project_description">Email me what platform you use so I can see if its compatible!
-                </div>
-            </div>
+
         </div>
         <div class="footer_box">
             <a href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>

@@ -155,8 +155,8 @@ app.use((req, res, next) => {
             'Cache-Control': 'public, max-age=172800'
         });
     }
-    if (req.headers.host === 'alekeagle.tk') {
-        res.redirect(301, 'https://alekeagle.com' + req.path);
+    if (req.headers.host !== 'i.alekeagle.com' && req.url === '/' && !req.headers.host.includes('localhost') && !req.headers.host.includes('192.168.')) {
+        res.redirect(301, 'https://i.alekeagle.com' + req.path);
         return;
     }
     console.log(`${req.ip}: ${req.method} => ${req.protocol}://${req.headers.host}${req.url}`);
@@ -576,17 +576,17 @@ app.patch('/api/user/domain/', (req, res) => {
 });
 app.get('/api/user/uploads/', (req, res) => {
     authenticate(req, res).then(() => {
-        let { id } = req.body,
-        count = req.body.count || 50,
-        offset = req.body.offset || 0;
+        let { id } = req.query,
+        count = req.query.count || 50,
+        offset = req.query.offset || 0;
         if (!id) {
             uploads.findAll({
                 where: {
-                    userid: req.session.id
+                    userid: req.session.user.id
                 }
             }).then(u => {
                 if (u !== null) {
-                    res.status(200).json(u);
+                    res.status(200).json(u.slice(offset, count));
                 }else {
                     res.sendStatus(204);
                 }
@@ -598,10 +598,10 @@ app.get('/api/user/uploads/', (req, res) => {
                         userid: id
                     }
                 }).then(u => {
-                    if (u !== null) {
-                        res.status(200).json(u);
+                    if (u.length !== 0) {
+                        res.status(200).json(u.slice(offset, count));
                     }else {
-                        res.sendStatus(204);
+                        res.sendStatus(404);
                     }
                 }).catch(err => {
                     res.sendStatus(500);
@@ -615,6 +615,37 @@ app.get('/api/user/uploads/', (req, res) => {
         res.sendStatus(401);
     });
 });
+app.get('/api/user/upload/', (req, res) => {
+    authenticate(req, res).then(() => {
+        let { name } = req.query;
+        if (!name) {res.sendStatus(400); return;}
+        uploads.findOne({
+            where: {
+                [Op.or]: [
+                    {filename: name}
+                ]
+            }
+        }).then(u => {
+            if (u !== null) {
+                if (u.userid === req.session.user.id) {
+                    res.status(200).json(u);
+                }else {
+                    if (req.session.user.staff !== '') {
+                        res.status(200).json(u);
+                    }else {
+                        res.sendStatus(401);
+                        return;
+                    }
+                }
+            }else {
+                res.sendStatus(404);
+                return;
+            }
+        });
+    }).catch(() => {
+        res.sendStatus(401);
+    });
+});
 app.delete('/api/user/uploads/delete/', (req, res) => {
     authenticate(req, res).then(() => {
         let { name } = req.body;
@@ -622,7 +653,6 @@ app.delete('/api/user/uploads/delete/', (req, res) => {
         uploads.findOne({
             where: {
                 [Op.or]: [
-                    {id: name},
                     {filename: name}
                 ]
             }
@@ -684,7 +714,7 @@ app.post('/upload/', upload.single('file'), (req, res) => {
                         writeStream = fs.createWriteStream(`${__dirname}/uploads/${filename}.txt`);
                     writeStream.write(req.body.file);
                     writeStream.end();
-                    res.status(201).end(`https://${u.subdomain}.${u.domain}/${filename}.txt`);
+                    res.status(201).end(`https://${u.subdomain ? `${u.subdomain}.` : ''}${u.domain}/${filename}.txt`);
                     uploads.create({filename: `${filename}.txt`, userid: u.id, size: req.body.file.length});
                 } else {
                     let ft = fileType(req.file.buffer.slice(0, fileType.minimumBytes));
@@ -692,7 +722,7 @@ app.post('/upload/', upload.single('file'), (req, res) => {
                     writeStream = fs.createWriteStream(`${__dirname}/uploads/${filename}.${ft ? ft.ext : map[req.file.mimetype]}`);
                     writeStream.write(req.file.buffer);
                     writeStream.end();
-                    res.status(201).end(`https://${u.subdomain}.${u.domain}/${filename}.${ft ? ft.ext : map[req.file.mimetype]}`);
+                    res.status(201).end(`https://${u.subdomain ? `${u.subdomain}.` : ''}${u.domain}/${filename}.${ft ? ft.ext : map[req.file.mimetype]}`);
                     uploads.create({filename: `${filename}.${ft ? ft.ext : map[req.file.mimetype]}`, userid: u.id, size: req.file.size});
                 }
             }else {
