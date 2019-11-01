@@ -41,6 +41,7 @@
                 fetch(`/api/user/uploads/?offset=${offset}`, {
                     credentials: "include"
                 }).then(res => res.json()).then(json => {
+                    offset += json.length;
                     if (json.length === 0) {
                         document.getElementById('load_more').hidden = true;
                     }
