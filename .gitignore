@@ -1,6 +1,6 @@
 node_modules
-uploads
 .env
 alekeagle.com.key
 alekeagle.com.pem
 .vscode
+/uploads

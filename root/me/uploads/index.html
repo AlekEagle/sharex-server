@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+    <head>
+        <title>AlekEagle ShareX User Dashboard</title>
+        <meta name="theme-color" content="#3a3a3a">
+        <link rel="shortcut icon" href="https://i.alekeagle.com/favicon.ico" type="image/x-icon" />
+        <meta property="og:title" content="AlekEagle ShareX User Dashboard">
+        <meta property="og:description" content="AlekEagle ShareX User Dashboard" />
+        <meta property="og:image" content="https://i.alekeagle.com/assets/images/me_irl.png">
+        <meta name="viewport" content="width=0.7,initial-scale=0.7">
+        <link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet" type="text/css">
+        <link href="/assets/css/universal.css" rel="stylesheet" type="text/css">
+        <!-- 
+        <canvas id="bgCanvas"></canvas>
+        <script type="text/javascript" src="assets/js/classical-noise.js"></script>
+        <script type="text/javascript" src="assets/js/bgAnimation.js"></script> -->
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'UA-135044771-1');
+        </script>
+        <script>
+            let offset = 0,
+                main;
+
+            function createPopup(url, menu) {
+                popupWindow = window.open(url, 'popUpWindow',
+                    `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
+                )
+            }
+
+            function loadMore() {
+                fetch(`/api/user/uploads/?offset=${offset}`, {
+                    credentials: "include"
+                }).then(res => res.json()).then(json => {
+                    if (json.length === 0) {
+                        document.getElementById('load_more').hidden = true;
+                    }
+                    json.forEach(i => {
+                        let iLink = document.createElement('a');
+                        iLink.href = `info/?name=${i.filename}`;
+                        let iBox = document.createElement('div');
+                        iLink.appendChild(iBox);
+                        iBox.classList.add('project');
+                        iBox.classList.add('float');
+                        iBox.classList.add('auth');
+                        let iTitle = document.createElement('div');
+                        iBox.appendChild(iTitle);
+                        iTitle.classList.add('project_title');
+                        iTitle.innerText = i.filename;
+                        let iDesc = document.createElement('div');
+                        iBox.appendChild(iDesc);
+                        iDesc.classList.add('project_description');
+                        iDesc.innerText =
+                            `Click me to view more info about ${i.filename}`;
+                        main.appendChild(iLink);
+                    });
+                });
+            }
+
+            function init() {
+                main = document.getElementById('projects');
+                fetch('/api/authenticate/', {
+                    credentials: 'include'
+                }).then(res => {
+                    if (res.status !== 200) {
+                        document.location.href =
+                            `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
+                        return;
+                    } else {
+                        fetch('/api/user/uploads/', {
+                            credentials: "include"
+                        }).then(res => res.json()).then(json => {
+                            offset += json.length;
+                            json.forEach(i => {
+                                let iLink = document.createElement('a');
+                                iLink.href = `info/?name=${i.filename}`;
+                                let iBox = document.createElement('div');
+                                iLink.appendChild(iBox);
+                                iBox.classList.add('project');
+                                iBox.classList.add('float');
+                                iBox.classList.add('auth');
+                                let iTitle = document.createElement('div');
+                                iBox.appendChild(iTitle);
+                                iTitle.classList.add('project_title');
+                                iTitle.innerText = i.filename;
+                                let iDesc = document.createElement('div');
+                                iBox.appendChild(iDesc);
+                                iDesc.classList.add('project_description');
+                                iDesc.innerText =
+                                    `Click me to view more info about ${i.filename}`;
+                                main.appendChild(iLink);
+                            });
+                        });
+                    }
+                });
+            }
+            document.addEventListener('readystatechange', e => {
+                if (document.readyState === 'interactive') {
+                    init();
+                }
+            })
+        </script>
+    </head>
+
+    <body>
+        <header class="header">
+            <div class="header__inner">
+                <a href="/">
+                    <img class="header__logo" src="/assets/images/me_irl.png" style="border-radius: 50%;height: 90px;"
+                        alt="AlekEagle">
+                    <h1 class="header__title">
+                        Your Uploads
+                    </h1>
+                </a>
+                <br><a href="javascript:history.back()"><button class="button header_button">Back</button></a>
+            </div>
+        </header>
+        <div class="under_header"></div>
+        <p id="subtitle" class="subtitle">View and manage everything you've uploaded here.</b>
+        </p>
+        <div id="projects" class="projects">
+
+        </div>
+        <div class="footer_box">
+            <a href="javascript:loadMore()" id="load_more" class="footer_text">Load More..</a><br><br><a
+                href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>
+        </div>
+    </body>
+
+</html>

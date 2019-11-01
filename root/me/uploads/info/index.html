@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+    <head>
+        <title>AlekEagle ShareX User Dashboard</title>
+        <meta name="theme-color" content="#3a3a3a">
+        <link rel="shortcut icon" href="https://i.alekeagle.com/favicon.ico" type="image/x-icon" />
+        <meta property="og:title" content="AlekEagle ShareX User Dashboard">
+        <meta property="og:description" content="AlekEagle ShareX User Dashboard" />
+        <meta property="og:image" content="https://i.alekeagle.com/assets/images/me_irl.png">
+        <meta name="viewport" content="width=0.7,initial-scale=0.7">
+        <link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet" type="text/css">
+        <link href="/assets/css/universal.css" rel="stylesheet" type="text/css">
+        <!-- 
+        <canvas id="bgCanvas"></canvas>
+        <script type="text/javascript" src="assets/js/classical-noise.js"></script>
+        <script type="text/javascript" src="assets/js/bgAnimation.js"></script> -->
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'UA-135044771-1');
+        </script>
+        <script>
+            let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+                'October', 'November', 'December'
+            ];
+            let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+            let queryObj = JSON.parse(
+                `{${document.location.search.replace(/\?/, '').split('&').map(q => `"${q.split('=')[0]}": "${q.split('=')[1]}"`).join(', ')}}`
+            );
+
+            function createPopup(url, menu) {
+                popupWindow = window.open(url, 'popUpWindow',
+                    `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
+                )
+            }
+
+            function confirmDelete(name) {
+                if (confirm(`Are you sure you want to delete the upload: ${name}? THIS CANNOT BE UNDONE.`)) {
+                    deleteUpload(name);
+                }
+            }
+
+            function deleteUpload(name) {
+                fetch('/api/user/uploads/delete/', {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name
+                    })
+                }).then(res => {
+                    switch (res.status) {
+                        case 200:
+                            history.back();
+                            break;
+                        case 401:
+                            document.getElementById('edit_err').innerText =
+                                'You are unauthorized to preform this action. Try signing out and back in.';
+                            break;
+                        case 500:
+                            document.getElementById('edit_err').innerText =
+                                'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
+                    }
+                });
+            }
+
+            function init() {
+                fetch('/api/authenticate/', {
+                    credentials: 'include'
+                }).then(res => {
+                    if (res.status !== 200) {
+                        document.location.href =
+                            `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
+                        return;
+                    } else {
+                        if (!queryObj.name) {
+                            document.location.href =
+                                `${document.location.protocol}//${document.location.host}/me/uploads/`;
+                            return;
+                        }
+                        fetch(`/api/user/upload/?name=${queryObj.name}`, {
+                            credentials: 'include'
+                        }).then(res => res.json()).then(json => {
+                            document.getElementById('delete').addEventListener('click', () =>
+                                confirmDelete(json.filename), false);
+                            document.getElementById('metadata').innerHTML =
+                                `Uploaded on: ${days[new Date(json.createdAt).getDay()]} - ${months[new Date(json.createdAt).getMonth()]} ${days[new Date(json.createdAt).getDay()]} ${new Date(json.createdAt).getDate()} - ${new Date(json.createdAt).getFullYear()}<br>Filename: ${json.filename}<br>Uploaded By: You!<br>Pro Tip: Click on me to view the image!`;
+                            document.getElementById('file_link').href =
+                                `javascript:createPopup('https://i.alekeagle.com/${json.filename}', 'yes')`
+                        });
+                    }
+                });
+
+            }
+            document.addEventListener('readystatechange', e => {
+                if (document.readyState === 'interactive') {
+                    init();
+                }
+            })
+        </script>
+    </head>
+
+    <body>
+        <header class="header">
+            <div class="header__inner">
+                <a href="/">
+                    <img class="header__logo" src="/assets/images/me_irl.png" style="border-radius: 50%;height: 90px;"
+                        alt="AlekEagle">
+                    <h1 class="header__title">
+                        Upload Info
+                    </h1>
+                </a>
+                <br><a href="javascript:history.back()"><button class="button header_button">Back</button></a>
+            </div>
+        </header>
+        <div class="under_header"></div>
+        <div class="projects">
+            <a id="file_link">
+                <div class="project float auth">
+                    <div class="project_title">File Metadata</div>
+                    <div id="metadata" class="project_description"></div>
+                </div>
+            </a>
+            <div id="delete" class="project float auth">
+                <div class="project_title">Delete the file</div>
+                <div id="metadata" class="project_description">
+                    This will delete the file, no take backsies!
+                    <br>
+                    <p hidden id="delete_err"></p>
+                </div>
+            </div>
+        </div>
+        <div class="footer_box">
+            <a href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>
+        </div>
+    </body>
+
+</html>
