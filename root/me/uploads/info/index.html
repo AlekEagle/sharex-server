@@ -94,7 +94,7 @@
                             document.getElementById('delete').addEventListener('click', () =>
                                 confirmDelete(json.filename), false);
                             document.getElementById('metadata').innerHTML =
-                                `Uploaded on: ${days[new Date(json.createdAt).getDay()]} - ${months[new Date(json.createdAt).getMonth()]} ${days[new Date(json.createdAt).getDay()]} ${new Date(json.createdAt).getDate()} - ${new Date(json.createdAt).getFullYear()}<br>Filename: ${json.filename}<br>Uploaded By: You!<br>Pro Tip: Click on me to view the image!`;
+                                `Uploaded on: ${days[new Date(json.createdAt).getDay()]} - ${months[new Date(json.createdAt).getMonth()]} ${days[new Date(json.createdAt).getDay()]} ${new Date(json.createdAt).getDate()} - ${new Date(json.createdAt).getFullYear()}<br>Filename: ${json.filename}<br>Uploaded By: You!<br>Pro Tip: Click on me to view the file!`;
                             document.getElementById('file_link').href =
                                 `javascript:createPopup('https://i.alekeagle.com/${json.filename}', 'yes')`
                         });

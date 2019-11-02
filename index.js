@@ -583,6 +583,7 @@ app.get('/api/user/uploads/', (req, res) => {
             uploads.findAll({
                 offset,
                 limit: count,
+                order: [['updatedAt', 'DESC']],
                 where: {
                     userid: req.session.user.id
                 }
@@ -598,6 +599,7 @@ app.get('/api/user/uploads/', (req, res) => {
                 uploads.findAll({
                     offset,
                     limit: count,
+                    order: [['updatedAt', 'DESC']],
                     where: {
                         userid: id
                     }
