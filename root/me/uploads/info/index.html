@@ -17,6 +17,7 @@
         <script type="text/javascript" src="assets/js/bgAnimation.js"></script> -->
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-1"></script>
+        <script src="/assets/js/memory.js"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
 
@@ -94,9 +95,10 @@
                             document.getElementById('delete').addEventListener('click', () =>
                                 confirmDelete(json.filename), false);
                             document.getElementById('metadata').innerHTML =
-                                `Uploaded on: ${days[new Date(json.createdAt).getDay()]} - ${months[new Date(json.createdAt).getMonth()]} ${days[new Date(json.createdAt).getDay()]} ${new Date(json.createdAt).getDate()} - ${new Date(json.createdAt).getFullYear()}<br>Filename: ${json.filename}<br>Uploaded By: You!<br>Pro Tip: Click on me to view the file!`;
+                                `Uploaded on: ${days[new Date(json.createdAt).getDay()]} - ${months[new Date(json.createdAt).getMonth()]} ${days[new Date(json.createdAt).getDay()]} ${new Date(json.createdAt).getDate()} - ${new Date(json.createdAt).getFullYear()}<br>Filename: ${json.filename}<br>Uploaded By: You!<br>File Size: ${memory(json.size)}<br>Pro Tip: Click on me to view the file!`;
                             document.getElementById('file_link').href =
-                                `javascript:createPopup('https://i.alekeagle.com/${json.filename}', 'yes')`
+                                `https://i.alekeagle.com/${json.filename}`;
+                            document.getElementById('file_link').target = '_blank';
                         });
                     }
                 });
