@@ -34,7 +34,71 @@
                 )
             }
 
+            function uploadFile() {
+                let formData = new FormData();
+                formData.append('file', document.getElementById('upload').files[0]);
+                fetch('/api/self/', {
+                    credentials: "include"
+                }).then(res => res.json()).then(json => {
+                    fetch('/upload/', {
+                        credentials: "include",
+                        headers: {
+                            "Authorization": json.apiToken
+                        },
+                        method: 'POST',
+                        body: formData
+                    }).then(res => res.text()).then(text => {
+                        let iBox = document.createElement('div');
+                        iBox.classList.add('project');
+                        iBox.classList.add('float');
+                        iBox.classList.add('auth');
+                        let iTitle = document.createElement('div');
+                        iBox.appendChild(iTitle);
+                        iTitle.classList.add('project_title');
+                        iTitle.innerText = 'Success!';
+                        let iDesc = document.createElement('div');
+                        iBox.appendChild(iDesc);
+                        iDesc.classList.add('project_description');
+                        let iDescText = document.createElement('p');
+                        iDescText.innerText =
+                            'It uploaded! To get the link, click on the textbox below, it will be put into your clipboard!';
+                        iDesc.appendChild(iDescText);
+                        let iDescTBox = document.createElement('input');
+                        iDescTBox.type = 'text';
+                        iDescTBox.classList.add('darktextbox');
+                        iDescTBox.value = text;
+                        iDescTBox.addEventListener('click', e => {
+                            iDescTBox.select();
+                            iDescTBox.setSelectionRange(0, 9999999);
+                            document.execCommand('copy');
+                        }, false);
+                        iDesc.appendChild(iDescTBox);
+                        document.getElementById('projects').appendChild(iBox);
+                    });
+                });
+            }
+
             function init() {
+                var inputs = document.querySelectorAll('.uploadfile');
+                Array.prototype.forEach.call(inputs, input => {
+                    var label = input.nextElementSibling,
+                        labelVal = label.innerHTML;
+
+                    input.addEventListener('change', e => {
+                        var fileName = '';
+                        if (this.files && this.files.length > 1) {
+                            fileName = (this.getAttribute('data-multiple-caption') || '').replace(
+                                '{count}', this.files.length);
+                        } else {
+                            fileName = e.target.value.split('\\').pop();
+                        }
+                        if (fileName) {
+                            label.innerHTML = fileName;
+                        } else {
+                            label.innerHTML = labelVal;
+                        }
+                    })
+                })
                 fetch('/api/authenticate/', {
                     credentials: 'include'
                 }).then(res => {
@@ -43,7 +107,7 @@
                             `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
                         return;
                     } else {
-
+                        document.getElementById('send').addEventListener('click', uploadFile, false);
                     }
                 });
             }
@@ -51,7 +115,7 @@
                 if (document.readyState === 'interactive') {
                     init();
                 }
-            })
+            });
         </script>
     </head>
 
@@ -71,8 +135,12 @@
         <div class="under_header"></div>
         <p id="subtitle" class="subtitle">Upload a file straight from your browser</b>
         </p>
-        <div class="projects">
-
+        <div class="projects" id="projects">
+            <div class="project float auth">
+                <input type="file" name="upload" id="upload" class="uploadfile">
+                <label for="upload">Your file here</label>
+                <button class="button" id="send">Beam it up, Scotty</button>
+            </div>
         </div>
         <div class="footer_box">
             <a href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>
