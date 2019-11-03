@@ -501,14 +501,14 @@ input {
 
 .uploadfile {
     width: 0.1px;
-	height: 0.1px;
-	opacity: 0;
-	overflow: hidden;
-	position: absolute;
-	z-index: -1;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
 }
 
-.uploadfile + label {
+.uploadfile+label {
     font-size: 1.25em;
     font-weight: 700;
     color: white;
@@ -520,7 +520,7 @@ input {
     cursor: pointer;
 }
 
-.uploadfile + label:hover {
+.uploadfile+label:hover {
     background-color: #1f1f1f;
 }
 
@@ -609,15 +609,16 @@ input {
     visibility: hidden;
     min-width: 250px;
     margin-left: -125px;
-    background-color: #333;
+    background-color: #333333;
     color: #fff;
     text-align: center;
-    border-radius: 2px;
+    border-radius: 10px;
     padding: 16px;
     position: fixed;
     z-index: 1;
     right: 40px;
     bottom: 30px;
+    box-shadow: 13px 13px 5px #141414, inset 0px 0px 5px #2c2c2c;
 }
 
 #snackbar.show {

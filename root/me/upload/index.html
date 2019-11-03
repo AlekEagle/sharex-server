@@ -17,6 +17,7 @@
         <script type="text/javascript" src="assets/js/bgAnimation.js"></script> -->
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-1"></script>
+        <script defer src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
 
@@ -35,6 +36,9 @@
             }
 
             function uploadFile() {
+                if (document.getElementById('uploadSuccess')) {
+                    document.getElementById('uploadSuccess').remove();
+                }
                 let formData = new FormData();
                 formData.append('file', document.getElementById('upload').files[0]);
                 fetch('/api/self/', {
@@ -52,6 +56,8 @@
                         iBox.classList.add('project');
                         iBox.classList.add('float');
                         iBox.classList.add('auth');
+                        iBox.classList.add('clipboard');
+                        iBox.id = 'uploadSuccess';
                         let iTitle = document.createElement('div');
                         iBox.appendChild(iTitle);
                         iTitle.classList.add('project_title');
@@ -61,24 +67,23 @@
                         iDesc.classList.add('project_description');
                         let iDescText = document.createElement('p');
                         iDescText.innerText =
-                            'It uploaded! To get the link, click on the textbox below, it will be put into your clipboard!';
+                            'It uploaded! To get the link, click me!';
                         iDesc.appendChild(iDescText);
-                        let iDescTBox = document.createElement('input');
-                        iDescTBox.type = 'text';
-                        iDescTBox.classList.add('darktextbox');
-                        iDescTBox.value = text;
-                        iDescTBox.addEventListener('click', e => {
-                            iDescTBox.select();
-                            iDescTBox.setSelectionRange(0, 9999999);
-                            document.execCommand('copy');
-                        }, false);
-                        iDesc.appendChild(iDescTBox);
+                        iBox.addEventListener('click', help, false);
+                        iBox.setAttribute('data-clipboard-text', text)
                         document.getElementById('projects').appendChild(iBox);
                     });
                 });
             }
 
+            function help() {
+                var x = document.getElementById("snackbar");
+                x.className = "show";
+                setTimeout(function(){ x.className = x.className.replace("show", ""); }, 7000);
+            }
+
             function init() {
+                window.addEventListener('load', () => new ClipboardJS('.clipboard'), false);
                 var inputs = document.querySelectorAll('.uploadfile');
                 Array.prototype.forEach.call(inputs, input => {
                     var label = input.nextElementSibling,
@@ -145,6 +150,7 @@
         <div class="footer_box">
             <a href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>
         </div>
+        <div id="snackbar">Upload link copied to clipboard.</div>
     </body>
 
 </html>
