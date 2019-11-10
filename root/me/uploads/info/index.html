@@ -91,15 +91,23 @@
                         }
                         fetch(`/api/user/upload/?name=${queryObj.name}`, {
                             credentials: 'include'
-                        }).then(res => res.json()).then(json => {
-                            document.getElementById('delete').addEventListener('click', () =>
-                                confirmDelete(json.filename), false);
-                            document.getElementById('metadata').innerHTML =
-                                `Uploaded on: ${days[new Date(json.createdAt).getDay()]} - ${months[new Date(json.createdAt).getMonth()]} ${days[new Date(json.createdAt).getDay()]} ${new Date(json.createdAt).getDate()} - ${new Date(json.createdAt).getFullYear()}<br>Filename: ${json.filename}<br>Uploaded By: You!<br>File Size: ${memory(json.size)}<br>Pro Tip: Click on me to view the file!`;
-                            document.getElementById('file_link').href =
-                                `https://i.alekeagle.com/${json.filename}`;
-                            document.getElementById('file_link').target = '_blank';
-                        });
+                        }).then(res => {
+                            if (res.status === 200) {
+                                res.json().then(json => {
+                                    document.getElementById('delete').addEventListener('click',
+                                        () =>
+                                        confirmDelete(json.filename), false);
+                                    document.getElementById('metadata').innerHTML =
+                                        `Uploaded on: ${days[new Date(json.createdAt).getDay()]} - ${months[new Date(json.createdAt).getMonth()]} ${days[new Date(json.createdAt).getDay()]} ${new Date(json.createdAt).getDate()} - ${new Date(json.createdAt).getFullYear()}<br>Filename: ${json.filename}<br>Uploaded By: You!<br>File Size: ${memory(json.size)}<br>Pro Tip: Click on me to view the file!`;
+                                    document.getElementById('file_link').href =
+                                        `https://i.alekeagle.com/${json.filename}`;
+                                    document.getElementById('file_link').target = '_blank';
+                                });
+                            } else {
+                                document.location.href =
+                                    `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
+                            }
+                        })
                     }
                 });
 

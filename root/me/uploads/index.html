@@ -40,47 +40,13 @@
             function loadMore() {
                 fetch(`/api/user/uploads/?offset=${offset}`, {
                     credentials: "include"
-                }).then(res => res.json()).then(json => {
-                    offset += json.length;
-                    if (json.length === 0) {
-                        document.getElementById('load_more').hidden = true;
-                    }
-                    json.forEach(i => {
-                        let iLink = document.createElement('a');
-                        iLink.href = `info/?name=${i.filename}`;
-                        let iBox = document.createElement('div');
-                        iLink.appendChild(iBox);
-                        iBox.classList.add('project');
-                        iBox.classList.add('float');
-                        iBox.classList.add('auth');
-                        let iTitle = document.createElement('div');
-                        iBox.appendChild(iTitle);
-                        iTitle.classList.add('project_title');
-                        iTitle.innerText = i.filename;
-                        let iDesc = document.createElement('div');
-                        iBox.appendChild(iDesc);
-                        iDesc.classList.add('project_description');
-                        iDesc.innerText =
-                            `Click me to view more info about ${i.filename}`;
-                        main.appendChild(iLink);
-                    });
-                });
-            }
-
-            function init() {
-                main = document.getElementById('projects');
-                fetch('/api/authenticate/', {
-                    credentials: 'include'
                 }).then(res => {
-                    if (res.status !== 200) {
-                        document.location.href =
-                            `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
-                        return;
-                    } else {
-                        fetch('/api/user/uploads/', {
-                            credentials: "include"
-                        }).then(res => res.json()).then(json => {
+                    if (res.status === 200) {
+                        res.json().then(json => {
                             offset += json.length;
+                            if (json.length === 0) {
+                                document.getElementById('load_more').hidden = true;
+                            }
                             json.forEach(i => {
                                 let iLink = document.createElement('a');
                                 iLink.href = `info/?name=${i.filename}`;
@@ -100,6 +66,62 @@
                                     `Click me to view more info about ${i.filename}`;
                                 main.appendChild(iLink);
                             });
+                        });
+                    }else {
+                        document.location.href =
+                            `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
+                    }
+                });
+            }
+
+            function init() {
+                main = document.getElementById('projects');
+                fetch('/api/authenticate/', {
+                    credentials: 'include'
+                }).then(res => {
+                    if (res.status !== 200) {
+                        document.location.href =
+                            `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
+                        return;
+                    } else {
+                        fetch('/api/user/uploads/count/', {
+                            credentials: "include"
+                        }).then(res => res.text()).then(text => {
+                            document.getElementById('subtitle').innerHTML = `View and manage everything you've uploaded here.<br>You've uploaded ${text} files.`
+                        });
+                        fetch('/api/user/uploads/', {
+                            credentials: "include"
+                        }).then(res => {
+                            if (res.status === 200) {
+                                res.json().then(json => {
+                                    offset += json.length;
+                                    if (json.length === 0) {
+                                        document.getElementById('load_more').hidden = true;
+                                    }
+                                    json.forEach(i => {
+                                        let iLink = document.createElement('a');
+                                        iLink.href = `info/?name=${i.filename}`;
+                                        let iBox = document.createElement('div');
+                                        iLink.appendChild(iBox);
+                                        iBox.classList.add('project');
+                                        iBox.classList.add('float');
+                                        iBox.classList.add('auth');
+                                        let iTitle = document.createElement('div');
+                                        iBox.appendChild(iTitle);
+                                        iTitle.classList.add('project_title');
+                                        iTitle.innerText = i.filename;
+                                        let iDesc = document.createElement('div');
+                                        iBox.appendChild(iDesc);
+                                        iDesc.classList.add('project_description');
+                                        iDesc.innerText =
+                                            `Click me to view more info about ${i.filename}`;
+                                        main.appendChild(iLink);
+                                    });
+                                });
+                            }else {
+                                document.location.href =
+                                    `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
+                            }
                         });
                     }
                 });

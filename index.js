@@ -118,7 +118,7 @@ app.use(session({
         path: '/'
     }
 }));
-function authenticate(req, res) {
+function authenticate(req, staff) {
     return new Promise((resolve, reject) => {
         if (!req.session.user) {
             req.session.reset();
@@ -132,21 +132,29 @@ function authenticate(req, res) {
             }).then(u => {
                 if (u !== null) {
                     if (u.password === req.session.user.password) {
-                        resolve();
+                        if (staff) {
+                            if (u.staff) {
+                                resolve();
+                            }else {
+                                reject(true);
+                            }
+                        }else {
+                            resolve();
+                        }
                     }else {
                         req.session.reset();
-                        reject();
+                        reject(false);
                     }
                 }else {
                     req.session.reset();
-                    reject();
+                    reject(false);
                 }
             });
         }
     });
 }
-app.use((req, res, next) => { 
-    if (req.url.startsWith('/me') || req.url.startsWith('/api')) {
+app.use((req, res, next) => {
+    if (req.url.startsWith('/api')) {
         res.set({
             'Cache-Control': 'no-cache'
         });
@@ -163,28 +171,50 @@ app.use((req, res, next) => {
     next();
 });
 app.get('/api/users/', (req, res) => {
-    user.findAll().then(users => {
-        res.status(200).json(users.map(u => { id, username, staff, createdAt, bannedAt }));
-    }, err => {
-        res.sendStatus(500);
-        console.error(err);
+    authenticate(req).then(() => {
+        let count = parseInt(req.query.count) || 50,
+        offset = parseInt(req.query.offset) || 0;
+        if (req.session.user.staff !== '') {
+            user.findAll({
+                offset,
+                limit: count,
+                order: [['createdAt', 'DESC']]
+            }).then(u => {
+                if (u !== null) {
+                    res.status(200).json(u.map(user => {return {id: user.id,username: user.username,displayName: user.displayName,staff: user.staff,createdAt: user.createdAt,bannedAt: user.bannedAt }}));
+                }else {
+                    res.sendStatus(204);
+                }
+            }).catch(err => {
+                res.sendStatus(500);
+                console.error(err);
+            });
+        }else {
+            res.sendStatus(403);
+        }
+    }).catch(() => {
+        res.sendStatus(401);
     });
 })
 app.get('/api/user/', (req, res) => {
-    if (!req.query.id) res.status(400).json({ error: 'You must provide a valid query string.' });
-    else {
-        user.findOne({
-            where: {
-                id: req.query.id
-            }
-        }).then(user => {
-            if (user === undefined) res.status(404).json({ error: 'Not found' });
-            else res.status(200).json({ id, username, staff, createdAt, bannedAt });
-        }, err => {
-            res.sendStatus(500);
-            console.error(err);
-        });
-    }
+    authenticate(req).then(() => {
+        if (!req.query.id) res.sendStatus(400);
+        else {
+            user.findOne({
+                where: {
+                    id: req.query.id
+                }
+            }).then(user => {
+                if (user === undefined) res.status(404).json({ error: 'Not found' });
+                else res.status(200).json({ id: user.id, username: user.username, displayName: user.displayName, staff: user.staff, createdAt: user.createdAt, bannedAt: user.bannedAt });
+            }, err => {
+                res.sendStatus(500);
+                console.error(err);
+            });
+        }
+    }).catch(() => {
+        res.sendStatus(401);
+    });
 });
 app.post('/api/user/create/', (req, res) => {
     let { name, email, password } = req.body;
@@ -231,7 +261,7 @@ app.post('/api/user/create/', (req, res) => {
     }
 });
 app.put('/api/user/update/', (req, res) => {
-    authenticate(req, res).then(() => {
+    authenticate(req).then(() => {
         let { email, name, password, newPassword, id } = req.body;
         if (!(email || name || newPassword)) {
             res.sendStatus(400);
@@ -327,7 +357,7 @@ app.put('/api/user/update/', (req, res) => {
     });
 });
 app.delete('/api/user/delete/', (req, res) => {
-    authenticate(req, res).then(() => {
+    authenticate(req).then(() => {
         let { password, id } = req.body;
         if (id) {
             if (req.session.user.staff === '') {
@@ -449,21 +479,23 @@ app.post('/api/user/login/', (req, res) => {
     }
 });
 app.get('/api/self/', (req, res) => {
-    authenticate(req, res).then(() => {
-        res.status(200).json(req.session.user);
+    authenticate(req).then(() => {
+        let u = {...req.session.user};
+        delete u.password;
+        res.status(200).json(u);
     }, () => {
         res.sendStatus(401);
     });
 });
 app.get('/api/authenticate/', (req, res) => {
-    authenticate(req, res).then(() => {
+    authenticate(req).then(() => {
         res.sendStatus(200);
     }, () => {
         res.sendStatus(401);
     });
 });
 app.post('/api/user/regentoken/', (req, res) => {
-    authenticate(req, res).then(() => {
+    authenticate(req).then(() => {
         let { password } = req.body;
         if (!req.session.user) {
             res.sendStatus(401);
@@ -511,7 +543,7 @@ app.post('/api/user/regentoken/', (req, res) => {
     });
 });
 app.get('/api/user/save/', (req, res) => {
-    authenticate(req, res).then(() => {
+    authenticate(req).then(() => {
         switch(req.query.type) {
             case 'sharex':
                 res.set('Content-Disposition', 'attachment; filename="ShareX_Uploader.sxcu"');
@@ -535,7 +567,7 @@ app.get('/api/domains/', (req, res) => {
     });
 });
 app.patch('/api/user/domain/', (req, res) => {
-    authenticate(req, res).then(() => {
+    authenticate(req).then(() => {
         let { domain, subdomain } = req.body;
         subdomain = subdomain.replace(/ /g, '-');
         if (domain === 'alekeagle.com' && req.session.user.staff === '') {
@@ -575,7 +607,7 @@ app.patch('/api/user/domain/', (req, res) => {
     });
 });
 app.get('/api/user/uploads/', (req, res) => {
-    authenticate(req, res).then(() => {
+    authenticate(req).then(() => {
         let { id } = req.query,
         count = parseInt(req.query.count) || 50,
         offset = parseInt(req.query.offset) || 0;
@@ -622,7 +654,7 @@ app.get('/api/user/uploads/', (req, res) => {
     });
 });
 app.get('/api/user/upload/', (req, res) => {
-    authenticate(req, res).then(() => {
+    authenticate(req).then(() => {
         let { name } = req.query;
         if (!name) {res.sendStatus(400); return;}
         uploads.findOne({
@@ -652,8 +684,21 @@ app.get('/api/user/upload/', (req, res) => {
         res.sendStatus(401);
     });
 });
+app.get('/api/user/uploads/count/', (req, res) => {
+    authenticate(req).then(() => {
+        uploads.findAll({
+            where: {
+                userid: req.session.user.id
+            }
+        }).then(up => {
+            res.status(200).send(up.length.toString());
+        });
+    }).catch(() => {
+        res.sendStatus(401);
+    });
+})
 app.delete('/api/user/uploads/delete/', (req, res) => {
-    authenticate(req, res).then(() => {
+    authenticate(req).then(() => {
         let { name } = req.body;
         if (!name) {res.sendStatus(400); return;}
         uploads.findOne({
@@ -748,7 +793,9 @@ app.post('/upload/', upload.single('file'), (req, res) => {
         });
     }
 });
-app.use(express.static('root'), express.static('uploads'));
+app.use(express.static('root'), express.static('uploads'), (req, res, next) => {
+    
+});
 
 server.listen(port);
 console.log(`Server listening on port ${port}`);
