@@ -793,9 +793,7 @@ app.post('/upload/', upload.single('file'), (req, res) => {
         });
     }
 });
-app.use(express.static('root'), express.static('uploads'), (req, res, next) => {
-    
-});
+app.use(express.static('root'), express.static('uploads'));
 
 server.listen(port);
 console.log(`Server listening on port ${port}`);
