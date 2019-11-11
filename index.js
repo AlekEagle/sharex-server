@@ -170,6 +170,9 @@ app.use((req, res, next) => {
     console.log(`${req.ip}: ${req.method} => ${req.protocol}://${req.headers.host}${req.url}`);
     next();
 });
+app.all('/api/', (req, res) => {
+    res.status(200).json({hello: 'world', version: '1.0.9'});
+});
 app.get('/api/users/', (req, res) => {
     authenticate(req).then(() => {
         let count = parseInt(req.query.count) || 50,
