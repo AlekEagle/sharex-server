@@ -778,6 +778,7 @@ app.post('/upload/', upload.single('file'), (req, res) => {
                         writeStream = fs.createWriteStream(`${__dirname}/uploads/${filename}.txt`);
                     writeStream.write(req.body.file);
                     writeStream.end();
+                    writeStream.destroy();
                     res.status(201).end(`https://${u.subdomain ? `${u.subdomain}.` : ''}${u.domain}/${filename}.txt`);
                     uploads.create({filename: `${filename}.txt`, userid: u.id, size: req.body.file.length});
                 } else {
@@ -786,6 +787,7 @@ app.post('/upload/', upload.single('file'), (req, res) => {
                     writeStream = fs.createWriteStream(`${__dirname}/uploads/${filename}.${ft ? ft.ext : map[req.file.mimetype]}`);
                     writeStream.write(req.file.buffer);
                     writeStream.end();
+                    writeStream.destroy();
                     res.status(201).end(`https://${u.subdomain ? `${u.subdomain}.` : ''}${u.domain}/${filename}.${ft ? ft.ext : map[req.file.mimetype]}`);
                     uploads.create({filename: `${filename}.${ft ? ft.ext : map[req.file.mimetype]}`, userid: u.id, size: req.file.size});
                 }
