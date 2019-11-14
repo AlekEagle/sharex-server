@@ -11,12 +11,14 @@
         <meta name="viewport" content="width=0.7,initial-scale=0.7">
         <link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet" type="text/css">
         <link href="/assets/css/universal.css" rel="stylesheet" type="text/css">
+        <link rel="manifest" href="/manifest.json">
         <!-- 
         <canvas id="bgCanvas"></canvas>
         <script type="text/javascript" src="assets/js/classical-noise.js"></script>
         <script type="text/javascript" src="assets/js/bgAnimation.js"></script> -->
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-1"></script>
+        <script defer src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
 
@@ -28,6 +30,7 @@
             gtag('config', 'UA-135044771-1');
         </script>
         <script>
+            let timeout;
             function createPopup(url, menu) {
                 popupWindow = window.open(url, 'popUpWindow',
                     `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
@@ -56,7 +59,7 @@
                     credentials: "include"
                 }).then(res => res.json()).then(json => {
                     let subdomain = document.getElementById('subdomain'),
-                    domain = document.getElementById('domain');
+                        domain = document.getElementById('domain');
                     json.forEach(e => {
                         let a = document.createElement('option');
                         a.text = e.domain;
@@ -88,9 +91,7 @@
                     }).then(res => {
                         switch (res.status) {
                             case 200:
-                                document.location.href =
-                                    `${document.location.protocol}//${document.location.host}/me/`;
-                                return;
+                                window.location.reload();
                                 break;
                             case 400:
                                 document.getElementById('edit_err').innerText =
@@ -119,22 +120,49 @@
                             password: document.getElementById('password_regen').value
                         })
                     }).then(res => {
-                        switch(res.status) {
+                        switch (res.status) {
                             case 201:
-                                res.json().then(json => alert(`Success! Your token has been regenerated! Your new token is: ${json.token}`));
-                                document.location.reload();
-                            break;
+                                res.json().then(token => {
+                                    let iBox = document.createElement('div');
+                                    iBox.classList.add('project');
+                                    iBox.classList.add('float');
+                                    iBox.classList.add('auth');
+                                    iBox.classList.add('clipboard');
+                                    let iTitle = document.createElement('div');
+                                    iBox.appendChild(iTitle);
+                                    iTitle.classList.add('project_title');
+                                    iTitle.innerText = 'Success!';
+                                    let iDesc = document.createElement('div');
+                                    iBox.appendChild(iDesc);
+                                    iDesc.classList.add('project_description');
+                                    let iDescText = document.createElement('p');
+                                    iDescText.innerText =
+                                        'Your Token has been refreshed! To get it, click me!';
+                                    iDesc.appendChild(iDescText);
+                                    iBox.addEventListener('click', () => {
+                                        iBox.remove();
+                                        help('Your new token has been put on your clipboard, the page will now refresh.');
+                                        setTimeout(() => {
+                                            window.location.reload();
+                                        }, 7000);
+                                    }, false);
+                                    iBox.setAttribute('data-clipboard-text', token.token)
+                                    document.getElementById('projects').appendChild(iBox);
+                                });
+                                break;
                             case 401:
-                                document.getElementById('regen_err').innerText = 'You are unauthorized to preform this action. Your password might be incorrect, if it isn\'t incorrect, try signing out and sign back in.';
-                            break;
+                                document.getElementById('regen_err').innerText =
+                                    'You are unauthorized to preform this action. Your password might be incorrect, if it isn\'t incorrect, try signing out and sign back in.';
+                                break;
                             case 500:
-                                document.getElementById('regen_err').innerText = 'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
+                                document.getElementById('regen_err').innerText =
+                                    'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
                         }
                     })
                 }
 
                 function delAcc(e) {
-                    if (e.key !== 'Enter' && e.type !== 'click') return;      
+                    if (e.key !== 'Enter' && e.type !== 'click') return;
                     fetch('/api/user/delete/', {
                         credentials: 'include',
                         method: 'DELETE',
@@ -145,22 +173,35 @@
                             password: document.getElementById('password_del').value
                         })
                     }).then(res => {
-                        switch(res.status) {
+                        switch (res.status) {
                             case 200:
-                                alert('And it\'s done, we\'re sad to see you go.');
-                                document.location.reload();
-                            break;
+                                help('You\'re account has been deleted, you\'ll be redirected to the home page soon.')
+                                setTimeout(() => window.location.href = '/', 7000);
+                                break;
                             case 401:
-                                document.getElementById('del_err').innerText = 'Your session is invalid, log in again.';
-                            break;
+                                document.getElementById('del_err').innerText =
+                                    'Your session is invalid, log in again.';
+                                break;
                             case 400:
-                                document.getElementById('del_err').innerText = 'Your password is incorrect, please try again.';
-                            break;
+                                document.getElementById('del_err').innerText =
+                                    'Your password is incorrect, please try again.';
+                                break;
                             case 500:
-                                document.getElementById('del_err').innerText = 'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
+                                document.getElementById('del_err').innerText =
+                                    'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
                         }
                     });
                 }
+
+                function help(text) {
+                    var x = document.getElementById("snackbar");
+                    x.innerText = text;
+                    x.className = "show";
+                    timeout = setTimeout(function () {
+                        x.className = x.className.replace("show", "");
+                    }, 7000);
+                }
+
                 function updateDomains(e) {
                     if (e.key !== 'Enter' && e.type !== 'click') return;
                     fetch('/api/user/domain/', {
@@ -174,13 +215,13 @@
                             subdomain: document.getElementById('subdomain').value
                         })
                     }).then(res => {
-                        switch(res.status) {
+                        switch (res.status) {
                             case 200:
-                                alert(`Tada! Your new domain and subdomain combination is "${document.getElementById('subdomain').value.replace(/ /g, '-')}.${document.getElementById('domain').value}"!`);
-                                document.location.reload();
-                            break;
+                                res.json().then(domain => help(`You're new domain is ${domain.domain}!`))
+                                break;
                             case 500:
-                                document.getElementById('domain_err').innerText = 'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
+                                document.getElementById('domain_err').innerText =
+                                    'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
                         }
                     })
                 }
@@ -194,6 +235,7 @@
                 document.getElementById('del').addEventListener('click', delAcc, false);
                 document.getElementById('password_del').addEventListener('keydown', delAcc, false);
                 document.getElementById('domain_sel').addEventListener('click', updateDomains, false);
+                document.getElementById('subdomain').addEventListener('keydown', updateDomains, false);
 
             }
             document.addEventListener('readystatechange', e => {
@@ -214,14 +256,14 @@
                         Edit Your Profile
                     </h1>
                 </a>
-                <br><a href="javascript:history.back()"><button class="button header_button">Back</button></a>
+                <br><a href="/me/"><button class="button header_button">Back</button></a>
             </div>
         </header>
         <div class="under_header"></div>
         <p id="subtitle" class="subtitle">Edit your profile here. The only field required is your current password. <b>
                 ONLY FILL OUT WHAT YOU WANT TO EDIT!</b>
         </p>
-        <div class="projects">
+        <div class="projects" id="projects">
             <div class="project float auth">
                 <div class="project_title">Current Info</div>
                 <div id="info" class="project_description"></div>
@@ -232,10 +274,10 @@
                     <input type="text" name="username" id="username_edit" maxlength="30" placeholder="New Username"
                         class="darktextbox">
                     <input type="email" name="email" id="email_edit" placeholder="New Email" class="darktextbox">
-                    <input type="password" name="password" id="new_password_edit" maxlength="30" placeholder="New Password"
-                        class="darktextbox">
-                    <input type="password" name="password2" id="password_edit" maxlength="30" placeholder="Current Password"
-                        class="darktextbox">
+                    <input type="password" name="new_password_edit" id="new_password_edit" maxlength="30"
+                        placeholder="New Password" class="darktextbox">
+                    <input type="password" name="password_edit" id="password_edit" maxlength="30"
+                        placeholder="Current Password" class="darktextbox">
                     <br>
                     <button id="edit" class="button">Edit Myself</button>
                     <p id="edit_err" class="error_text"></p>
@@ -243,8 +285,9 @@
             </div>
             <div class="project float auth">
                 <div class="project_title">Domain and Subdomain</div>
-                <div class="project_description"><p>Choose your favorite domain and subdomain options!</p>
-                    <input type="text" id="subdomain" class="darktextbox"></input>.<select id="domain"></select>
+                <div class="project_description">
+                    <p>Choose your favorite domain and subdomain options!</p>
+                    <input type="text" id="subdomain" class="darktextbox" autofill="off" autocomplete="off"></input>.<select id="domain"></select>
                     <br>
                     <button id="domain_sel" class="button">I want that one</button>
                     <p id="domain_err" class="error_text"></p>
@@ -254,8 +297,8 @@
                 <div class="project_title">Regenerate your API token</div>
                 <div class="project_description">
                     <p>Regenerating your API token will render your previous token unusable, this is irreversible!</p>
-                    <input type="password" name="password2" id="password_regen" maxlength="30" placeholder="Current Password"
-                        class="darktextbox">
+                    <input type="password" name="password2" id="password_regen" maxlength="30"
+                        placeholder="Current Password" class="darktextbox">
                     <br>
                     <button id="regen" class="button">Regenerate It!</button>
                     <p id="regen_err" class="error_text"></p>
@@ -263,9 +306,11 @@
             </div>
             <div class="project float auth">
                 <div class="project_title">Delete your Account</div>
-                <div class="project_description"><p>Deleting your account is irreversible! Any files you have uploaded will be deleted within 7 days.</p>
-                    <input type="password" name="password2" id="password_del" maxlength="30" placeholder="Current Password"
-                        class="darktextbox">
+                <div class="project_description">
+                    <p>Deleting your account is irreversible! Any files you have uploaded will be deleted within 7 days.
+                    </p>
+                    <input type="password" name="password2" id="password_del" maxlength="30"
+                        placeholder="Current Password" class="darktextbox">
                     <br>
                     <button id="del" class="button">I'm Sure, Delete it</button>
                     <p id="del_err" class="error_text"></p>
@@ -275,6 +320,7 @@
         <div class="footer_box">
             <a href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>
         </div>
+        <div id="snackbar"></div>
     </body>
 
 </html>
