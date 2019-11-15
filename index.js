@@ -591,7 +591,7 @@ app.patch('/api/user/domain/', (req, res) => {
                     if (u !== null) {
                         u.update({domain, subdomain}).then(u => {
                             req.session.user = u;
-                            res.status(200).json({domain: `${subdomain ? `${subdomain}.` : ""}${domain}`});
+                            res.status(200).json({domain, subdomain});
                         });
                     }
                 }).catch(err => {

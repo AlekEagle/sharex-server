@@ -142,6 +142,8 @@ body {
     margin-top: 0;
 }
 
+
+
 button.button {
     width: fit-content;
     color: white;
@@ -493,8 +495,22 @@ select {
     margin-bottom: 10px;
 }
 
-.auth * {
+.auth .project_title {
     margin-left: 7px;
+}
+
+.auth .project_description {
+    padding-left: 7px;
+    padding-right: 7px;
+    text-align: center;
+}
+
+.auth .project_description select {
+    width: 100%;
+}
+
+.auth .project_description .darktextbox {
+    width: 100%;
 }
 
 .auth .project_description * {

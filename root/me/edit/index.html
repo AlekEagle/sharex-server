@@ -217,7 +217,11 @@
                     }).then(res => {
                         switch (res.status) {
                             case 200:
-                                res.json().then(domain => help(`You're new domain is ${domain.domain}!`))
+                                res.json().then(domain => {
+                                    help(`You're new domain is ${domain.subdomain ? `${domain.subdomain}.` : ''}${domain.domain}!`);
+                                    document.getElementById('domain').value = domain.domain;
+                                    document.getElementById('subdomain').value = domain.subdomain;
+                                });
                                 break;
                             case 500:
                                 document.getElementById('domain_err').innerText =
@@ -287,7 +291,7 @@
                 <div class="project_title">Domain and Subdomain</div>
                 <div class="project_description">
                     <p>Choose your favorite domain and subdomain options!</p>
-                    <input type="text" id="subdomain" class="darktextbox" autocomplete="off"></input>.<select id="domain"></select>
+                    <input type="text" id="subdomain" placeholder="Subdomain" class="darktextbox" autocomplete="off"></input><select id="domain"></select>
                     <br>
                     <button id="domain_sel" class="button">I want that one</button>
                     <p id="domain_err" class="error_text"></p>
