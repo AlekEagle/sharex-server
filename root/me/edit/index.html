@@ -218,7 +218,7 @@
                         switch (res.status) {
                             case 200:
                                 res.json().then(domain => {
-                                    help(`You're new domain is ${domain.subdomain ? `${domain.subdomain}.` : ''}${domain.domain}!`);
+                                    help(`Your new domain is ${domain.subdomain ? `${domain.subdomain}.` : ''}${domain.domain}!`);
                                     document.getElementById('domain').value = domain.domain;
                                     document.getElementById('subdomain').value = domain.subdomain;
                                 });
