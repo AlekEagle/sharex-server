@@ -147,9 +147,9 @@ body {
 button.button {
     width: fit-content;
     color: white;
-    margin: 5px 3px 5px 3px;
-    padding: 4px;
-    font-size: 28px;
+    margin: 5px 3px;
+    padding: 4px 18px;
+    font-size: 20px;
     border-radius: 10px;
     transition: 0.3s;
     background-color: #272727;
@@ -387,6 +387,7 @@ input {
     border-radius: 5px;
     transition: 0.3s;
     font-size: 20px;
+    padding: 6px 0;
 }
 
 select {
@@ -419,7 +420,6 @@ select {
     border: 1px solid #1d1d1d;
     float: left;
     transition: 0.3s;
-    cursor: pointer;
     outline: none;
     align-self: stretch;
 }
@@ -484,6 +484,15 @@ select {
     margin-top: 20px;
     margin-left: 5px;
     margin-right: 5px;
+    text-decoration: none;
+    transition-property: color;
+    transition-duration: 0.3s;
+}
+
+.footer_text:hover {
+    transition-property: color;
+    transition-duration: 0.3s;
+    color: #1199FF;
 }
 
 .footer_box {
@@ -514,8 +523,7 @@ select {
 }
 
 .auth .project_description * {
-    margin-top: 4px;
-    margin-bottom: 4px;
+    margin: 6px 0;
 }
 
 .header_button {
@@ -602,7 +610,7 @@ select {
 }
 
 .float:hover {
-    background: #252525;
+    background: #202020;
     box-shadow: 13px 13px 5px #141414b0;
     border: 1px solid #505050;
     transform: translate(-7px, -7px);
