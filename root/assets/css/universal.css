@@ -128,6 +128,7 @@ select {
     border-radius: 5px;
     background-color: black;
     outline: none;
+    padding: 6px 0;
 }
 
 a {
@@ -645,6 +646,9 @@ select {
 }
 
 #snackbar {
+    max-width: 80%;
+    overflow: hidden;
+    word-wrap: break-word;
     visibility: hidden;
     min-width: 250px;
     margin-left: -125px;
