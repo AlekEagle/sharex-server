@@ -30,6 +30,8 @@
             gtag('config', 'UA-135044771-1');
         </script>
         <script>
+            let files;
+
             function createPopup(url, menu) {
                 popupWindow = window.open(url, 'popUpWindow',
                     `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
@@ -41,7 +43,7 @@
                     document.getElementById('uploadSuccess').remove();
                 }
                 let formData = new FormData();
-                formData.append('file', document.getElementById('upload').files[0]);
+                formData.append('file', files[0]);
                 fetch('/api/self/', {
                     credentials: "include"
                 }).then(res => res.json()).then(json => {
@@ -85,7 +87,51 @@
                 }, 7000);
             }
 
+            function FileDragHover(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                e.target.className = (e.type == "dragover" ? "hover" : "");
+            }
+
             function init() {
+                document.getElementById('uploadlbl').addEventListener('dragover', e => {
+                    FileDragHover(e);
+                    e.target.innerText = 'Drop it right here!';
+                }, false);
+                document.getElementById('uploadlbl').addEventListener('dragleave', e => {
+                    FileDragHover(e);
+                    if (files) {
+                        e.target.innerText = files[0].name;
+                    } else {
+                        e.target.innerText = 'Your file here';
+                    }
+                }, false);
+                document.getElementById('uploadlbl').addEventListener('drop', e => {
+                    FileDragHover(e);
+                    if (e.dataTransfer.files && e.dataTransfer.files.length > 1) {
+                        e.target.innerText = 'That\'s too many files for me!';
+                        setTimeout(() => {
+                            if (files) {
+                                e.target.innerText = files[0].name;
+                            } else {
+                                e.target.innerText = 'Your file here';
+                            }
+                        }, 5000);
+                    } else if (e.dataTransfer.files.length === 1) {
+                        files = e.dataTransfer.files;
+                        if (files) {
+                            e.target.innerText = files[0].name;
+                        } else {
+                            e.target.innerText = 'Your file here';
+                        }
+                    } else {
+                        if (files) {
+                            e.target.innerText = files[0].name;
+                        } else {
+                            e.target.innerText = 'Your file here';
+                        }
+                    }
+                }, false);
                 window.addEventListener('load', () => new ClipboardJS('.clipboard'), false);
                 var inputs = document.querySelectorAll('.uploadfile');
                 Array.prototype.forEach.call(inputs, input => {
@@ -102,8 +148,10 @@
                         }
                         if (fileName) {
                             label.innerHTML = fileName;
+                            files = e.target.files;
                         } else {
                             label.innerHTML = labelVal;
+                            files = e.target.files;
                         }
                     })
                 })
@@ -146,7 +194,7 @@
         <div class="projects" id="projects">
             <div class="project float auth">
                 <input type="file" name="upload" id="upload" class="uploadfile">
-                <label for="upload">Your file here</label>
+                <label id="uploadlbl" data-label="Your file here" for="upload">Your file here</label>
                 <button class="button" id="send">Beam it up, Scotty</button>
             </div>
         </div>
