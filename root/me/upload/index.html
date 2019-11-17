@@ -39,6 +39,20 @@
             }
 
             function uploadFile() {
+                let iBox1 = document.createElement('div');
+                iBox1.classList.add('project');
+                iBox1.classList.add('float');
+                iBox1.classList.add('auth');
+                iBox1.id = 'uploading';
+                let iTitle1 = document.createElement('div');
+                iBox1.appendChild(iTitle1);
+                iTitle1.classList.add('project_title');
+                iTitle1.innerText = 'Uploading...';
+                let iDesc1 = document.createElement('div');
+                iBox1.appendChild(iDesc1);
+                iDesc1.classList.add('project_description');
+                iDesc1.innerHTML = '<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>';
+                document.getElementById('projects').appendChild(iBox1);
                 if (document.getElementById('uploadSuccess')) {
                     document.getElementById('uploadSuccess').remove();
                 }
@@ -55,6 +69,7 @@
                         method: 'POST',
                         body: formData
                     }).then(res => res.text()).then(text => {
+                        iBox1.remove();
                         let iBox = document.createElement('div');
                         iBox.classList.add('project');
                         iBox.classList.add('float');
