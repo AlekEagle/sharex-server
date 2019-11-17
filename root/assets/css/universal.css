@@ -470,6 +470,9 @@ select {
     justify-content: center;
 }
 
+.titanic {
+    float: none;
+}
 
 .subtitle {
     margin-top: 30px;
