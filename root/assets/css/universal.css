@@ -444,7 +444,7 @@ select {
 }
 
 .project_icon {
-    height: 128px;
+    height: 64px;
     float: left;
     margin: 15px;
 }
@@ -460,6 +460,8 @@ select {
     font-size: 15px !important;
     color: #9c9c9c;
     text-align: left;
+    overflow-x: hidden;
+    word-wrap: break-word;
 }
 
 .projects {
