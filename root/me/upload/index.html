@@ -68,29 +68,50 @@
                         },
                         method: 'POST',
                         body: formData
-                    }).then(res => res.text()).then(text => {
-                        iBox1.remove();
-                        let iBox = document.createElement('div');
-                        iBox.classList.add('project');
-                        iBox.classList.add('float');
-                        iBox.classList.add('auth');
-                        iBox.classList.add('clipboard');
-                        iBox.id = 'uploadSuccess';
-                        let iTitle = document.createElement('div');
-                        iBox.appendChild(iTitle);
-                        iTitle.classList.add('project_title');
-                        iTitle.innerText = 'Success!';
-                        let iDesc = document.createElement('div');
-                        iBox.appendChild(iDesc);
-                        iDesc.classList.add('project_description');
-                        let iDescText = document.createElement('p');
-                        iDescText.innerText =
-                            'It uploaded! To get the link, click me!';
-                        iDesc.appendChild(iDescText);
-                        iBox.addEventListener('click', help, false);
-                        iBox.setAttribute('data-clipboard-text', text)
-                        document.getElementById('projects').appendChild(iBox);
+                    }).then(res => {
+                        switch (res.status) {
+                            case 201:
+                                res.text().then(text => {
+                                    iBox1.remove();
+                                    let iBox = document.createElement('div');
+                                    iBox.classList.add('project');
+                                    iBox.classList.add('float');
+                                    iBox.classList.add('auth');
+                                    iBox.classList.add('clipboard');
+                                    iBox.id = 'uploadSuccess';
+                                    let iTitle = document.createElement('div');
+                                    iBox.appendChild(iTitle);
+                                    iTitle.classList.add('project_title');
+                                    iTitle.innerText = 'Success!';
+                                    let iDesc = document.createElement('div');
+                                    iBox.appendChild(iDesc);
+                                    iDesc.classList.add('project_description');
+                                    let iDescText = document.createElement('p');
+                                    iDescText.innerText =
+                                        'It uploaded! To get the link, click me!';
+                                    iDesc.appendChild(iDescText);
+                                    iBox.addEventListener('click', help, false);
+                                    iBox.setAttribute('data-clipboard-text', text)
+                                    document.getElementById('projects').appendChild(iBox);
+                                });
+                                break;
+                            case 500:
+                                iTitle1.innerText = 'Upload failed!';
+                                iDesc1.innerText = 'The webserver had an internal error. Were sorry.';
+                                break;
+                            default:
+                                iTitle1.innerText = 'Upload failed!';
+                                iDesc1.innerText =
+                                    'Ok, i\'m not quite sure what happened, all I know is that it happened, and it\'s not supposed to. You should report this to AlekEagle.'
+                        }
+                    }).catch(err => {
+                        iTitle1.innerText = 'Upload failed!';
+                        iDesc1.innerText =
+                            'I think the webserver crashed, report this error to AlekEagle.';
                     });
+                }).catch(err => {
+                    iTitle1.innerText = 'Upload failed!';
+                    iDesc1.innerText = 'I think the webserver crashed, report this error to AlekEagle.';
                 });
             }
 

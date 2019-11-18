@@ -483,9 +483,15 @@ app.post('/api/user/login/', (req, res) => {
 });
 app.get('/api/self/', (req, res) => {
     authenticate(req).then(() => {
-        let u = {...req.session.user};
-        delete u.password;
-        res.status(200).json(u);
+        user.findOne({
+            where: {
+                id: req.session.user.id
+            }
+        }).then(u => {
+            let usr = {...u.toJSON()};
+            delete usr.password;
+            res.status(200).json(usr);
+        })
     }, () => {
         res.sendStatus(401);
     });
