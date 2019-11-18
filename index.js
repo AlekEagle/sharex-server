@@ -163,7 +163,7 @@ app.use((req, res, next) => {
             'Cache-Control': 'public, max-age=172800'
         });
     }
-    if (req.headers.host !== 'i.alekeagle.com' && req.url === '/' && !req.headers.host.includes('localhost') && !req.headers.host.includes('192.168.')) {
+    if (req.headers.host !== 'alekeagle.me' && req.url === '/' && !req.headers.host.includes('localhost') && !req.headers.host.includes('192.168.')) {
         res.redirect(301, 'https://i.alekeagle.com' + req.path);
         return;
     }
