@@ -164,7 +164,7 @@ app.use((req, res, next) => {
         });
     }
     if (req.headers.host !== 'alekeagle.me' && req.url === '/' && !req.headers.host.includes('localhost') && !req.headers.host.includes('192.168.')) {
-        res.redirect(301, 'https://i.alekeagle.com' + req.path);
+        res.redirect(301, 'https://alekeagle.me' + req.path);
         return;
     }
     console.log(`${req.ip}: ${req.method} => ${req.protocol}://${req.headers.host}${req.url}`);
