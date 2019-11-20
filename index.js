@@ -559,11 +559,11 @@ app.get('/api/user/save/', (req, res) => {
         switch(req.query.type) {
             case 'sharex':
                 res.set('Content-Disposition', 'attachment; filename="ShareX_Uploader.sxcu"');
-                res.status(200).send(`{"Version": "12.4.1","Name": "AlekEagle ShareX Uploader","DestinationType": "ImageUploader, TextUploader, FileUploader","RequestMethod": "POST","RequestURL": "https://i.alekeagle.com/upload","Headers": {"Authorization": "${req.session.user.apiToken}"},"Body": "MultipartFormData","FileFormName": "file"}`);
+                res.status(200).send(`{"Version": "12.4.1","Name": "AlekEagle ShareX Uploader","DestinationType": "ImageUploader, TextUploader, FileUploader","RequestMethod": "POST","RequestURL": "https://alekeagle.me/upload/","Headers": {"Authorization": "${req.session.user.apiToken}"},"Body": "MultipartFormData","FileFormName": "file"}`);
             break;
             case 'sharenix':
                 res.set('Content-Disposition', 'attachment; filename="ShareNiX_Uploader.json"');
-                res.status(200).send(`{"Name": "AlekEagle ShareNiX Uploader","RequestType": "POST","Headers": {"Authorization": "${req.session.user.apiToken}"},"RequestURL": "https://i.alekeagle.com/upload","FileFormName": "file","ResponseType": "Text"}`);
+                res.status(200).send(`{"Name": "AlekEagle ShareNiX Uploader","RequestType": "POST","Headers": {"Authorization": "${req.session.user.apiToken}"},"RequestURL": "https://alekeagle.me/upload/","FileFormName": "file","ResponseType": "Text"}`);
             break;
             default:
                 res.sendStatus(404);
