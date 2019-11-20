@@ -163,12 +163,15 @@ app.use((req, res, next) => {
             'Cache-Control': 'public, max-age=172800'
         });
     }
-    if (req.headers.host !== 'alekeagle.me' && req.url === '/' && !req.headers.host.includes('localhost') && !req.headers.host.includes('192.168.')) {
-        res.redirect(301, 'https://alekeagle.me' + req.path);
-        return;
-    }
     console.log(`${req.ip}: ${req.method} => ${req.protocol}://${req.headers.host}${req.url}`);
     next();
+}, express.static('uploads'), (req, res, next) => {
+    if (req.headers.host !== 'alekeagle.me' && !req.headers.host.includes('localhost') && !req.headers.host.includes('192.168.')) {
+        res.redirect(301, 'https://alekeagle.me' + req.path);
+        return;
+    }else {
+        next();
+    }
 });
 app.all('/api/', (req, res) => {
     res.status(200).json({hello: 'world', version: '1.0.9'});
@@ -804,7 +807,7 @@ app.post('/upload/', upload.single('file'), (req, res) => {
         });
     }
 });
-app.use(express.static('root'), express.static('uploads'));
+app.use(express.static('root'));
 
 server.listen(port);
 console.log(`Server listening on port ${port}`);
