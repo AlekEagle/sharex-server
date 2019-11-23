@@ -4,10 +4,10 @@
     <head>
         <title>AlekEagle ShareX User Dashboard</title>
         <meta name="theme-color" content="#3a3a3a">
-        <link rel="shortcut icon" href="https://i.alekeagle.com/favicon.ico" type="image/x-icon" />
+        <link rel="shortcut icon" href="https://alekeagle.me/favicon.ico" type="image/x-icon" />
         <meta property="og:title" content="AlekEagle ShareX User Dashboard">
         <meta property="og:description" content="AlekEagle ShareX User Dashboard" />
-        <meta property="og:image" content="https://i.alekeagle.com/assets/images/me_irl.png">
+        <meta property="og:image" content="https://alekeagle.me/assets/images/me_irl.png">
         <meta name="viewport" content="width=0.7,initial-scale=0.7">
         <link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet" type="text/css">
         <link href="/assets/css/universal.css" rel="stylesheet" type="text/css">
@@ -17,7 +17,7 @@
         <script type="text/javascript" src="assets/js/classical-noise.js"></script>
         <script type="text/javascript" src="assets/js/bgAnimation.js"></script> -->
         <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-1"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-3"></script>
         <script src="/assets/js/memory.js"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
@@ -27,7 +27,7 @@
             }
             gtag('js', new Date());
 
-            gtag('config', 'UA-135044771-1');
+            gtag('config', 'UA-135044771-3');
         </script>
         <script>
             let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
@@ -101,7 +101,7 @@
                                     document.getElementById('metadata').innerHTML =
                                         `Uploaded on: ${days[new Date(json.createdAt).getDay()]} - ${months[new Date(json.createdAt).getMonth()]} ${days[new Date(json.createdAt).getDay()]} ${new Date(json.createdAt).getDate()} - ${new Date(json.createdAt).getFullYear()}<br>Filename: ${json.filename}<br>Uploaded By: You!<br>File Size: ${memory(json.size)}<br>Pro Tip: Click on me to view the file!`;
                                     document.getElementById('file_link').href =
-                                        `https://i.alekeagle.com/${json.filename}`;
+                                        `https://alekeagle.me/${json.filename}`;
                                     document.getElementById('file_link').target = '_blank';
                                 });
                             } else {

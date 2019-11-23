@@ -807,7 +807,9 @@ app.post('/upload/', upload.single('file'), (req, res) => {
         });
     }
 });
-app.use(express.static('root'));
+app.use(express.static('root'), (req, res, next) => {
+    res.status(404).sendFile(`${__dirname}/views/err404.html`);
+});
 
 server.listen(port);
 console.log(`Server listening on port ${port}`);
