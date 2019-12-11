@@ -426,6 +426,7 @@ select {
     transition: 0.3s;
     outline: none;
     align-self: stretch;
+    position: relative;
 }
 
 .project * {
