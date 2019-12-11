@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "dependencies": {
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^3.0.7",
     "chalk": "^2.4.2",
     "client-sessions": "^0.8.0",
     "cors": "^2.8.5",

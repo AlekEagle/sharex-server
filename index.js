@@ -111,7 +111,7 @@ let server = https.createServer(options, app);
 app.use(session({
     cookieName: 'session',
     secret: Math.random().toString(),
-    duration: ms('1 day'),
+    duration: ms('30 days'),
     activeDuration: ms('1 hour'),
     cookie: {
         httpOnly: true,
