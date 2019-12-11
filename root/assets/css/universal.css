@@ -457,7 +457,7 @@ select {
   
     /* fixes overlap error in IE7/8, 
        make sure you have an empty gif */
-    background-image: url('empty.gif');
+    background-image: url('/assets/images/empty.gif');
   }   
 
 .project_icon {
