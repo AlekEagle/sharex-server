@@ -133,6 +133,7 @@ select {
 
 a {
     color: #888888;
+    text-decoration: none;
 }
 
 body {
@@ -414,8 +415,8 @@ select {
 
 .project {
     margin: 10px;
-    padding-right: 5px;
-    padding-bottom: 5px;
+    padding-right: 10px;
+    padding-bottom: 15px;
     background: #1d1d1d;
     border-radius: 10px;
     border: 1px solid #1d1d1d;
@@ -450,18 +451,26 @@ select {
 }
 
 .project_title {
-    font-size: 18px !important;
+    font-size: 18px;
     text-align: left;
     margin-bottom: 10px;
     margin-top: 10px;
 }
 
 .project_description {
-    font-size: 15px !important;
+    font-size: 15px;
     color: #9c9c9c;
     text-align: left;
     overflow-x: hidden;
     word-wrap: break-word;
+}
+
+a .project_title {
+    font-size: 24px !important;
+}
+
+a .project_description {
+    font-size: 21px !important;
 }
 
 .projects {
