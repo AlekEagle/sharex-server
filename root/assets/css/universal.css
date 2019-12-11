@@ -592,9 +592,15 @@ select {
   }
 }
 
-@media screen and (min-width: 1153px) {
+@media screen and (min-width: 1153px) and (max-width: 1366px) {
   .project {
     width: calc((100vw - (22px * 3 + (5px * 14))) / 3);
+  }
+}
+
+@media screen and (min-width: 1367px) {
+  .project {
+    width: calc((100vw - (22px * 3 + (5px * 21))) / 4);
   }
 }
 
