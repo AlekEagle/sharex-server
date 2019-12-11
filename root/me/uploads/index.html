@@ -51,7 +51,9 @@
                                 let iLink = document.createElement('a');
                                 iLink.href = `info/?name=${i.filename}`;
                                 let iBox = document.createElement('div');
-                                iLink.appendChild(iBox);
+                                iBox.appendChild(iLink);
+                                let iSpan = document.createElement('span');
+                                iSpan.classList.add('project_link');
                                 iBox.classList.add('project');
                                 iBox.classList.add('float');
                                 iBox.classList.add('auth');

@@ -102,7 +102,6 @@
                                         `Uploaded on: ${days[new Date(json.createdAt).getDay()]} - ${months[new Date(json.createdAt).getMonth()]} ${days[new Date(json.createdAt).getDay()]} ${new Date(json.createdAt).getDate()} - ${new Date(json.createdAt).getFullYear()}<br>Filename: ${json.filename}<br>Uploaded By: You!<br>File Size: ${memory(json.size)}<br>Pro Tip: Click on me to view the file!`;
                                     document.getElementById('file_link').href =
                                         `https://alekeagle.me/${json.filename}`;
-                                    document.getElementById('file_link').target = '_blank';
                                 });
                             } else {
                                 document.location.href =
@@ -137,12 +136,11 @@
         <div class="under_header"></div>
         <p class="subtitle">Various file info and actions.</p>
         <div class="projects">
-            <a id="file_link">
-                <div class="project float auth">
-                    <div class="project_title">File Metadata</div>
-                    <div id="metadata" class="project_description"></div>
-                </div>
-            </a>
+            <div class="project float auth">
+                <a id="file_link" target="_blank"><span class="project_link"></span></a>
+                <div class="project_title">File Metadata</div>
+                <div id="metadata" class="project_description"></div>
+            </div>
             <div id="delete" class="project float auth">
                 <div class="project_title">Delete the file</div>
                 <div id="metadata" class="project_description">
