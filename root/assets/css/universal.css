@@ -461,14 +461,14 @@ select {
 .project_icon {
   height: 64px;
   float: left;
-  margin: 0px 7.5px 0px 0px;
+  margin: 15px;
 }
 
 .project_title {
   font-size: 1.2em;
   text-align: left;
   margin-bottom: 10px;
-  margin-top: 5px;
+  margin-top: 15px;
 }
 
 .project_description {
