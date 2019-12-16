@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en-US">
 
     <head>
@@ -57,6 +57,7 @@
                                 iBox.classList.add('project');
                                 iBox.classList.add('float');
                                 iBox.classList.add('auth');
+                                iLink.appendChild(iSpan);
                                 let iTitle = document.createElement('div');
                                 iBox.appendChild(iTitle);
                                 iTitle.classList.add('project_title');
@@ -66,7 +67,7 @@
                                 iDesc.classList.add('project_description');
                                 iDesc.innerText =
                                     `Click me to view more info about ${i.filename}`;
-                                main.appendChild(iLink);
+                                main.appendChild(iBox);
                             });
                         });
                     } else {
@@ -105,10 +106,13 @@
                                         let iLink = document.createElement('a');
                                         iLink.href = `info/?name=${i.filename}`;
                                         let iBox = document.createElement('div');
-                                        iLink.appendChild(iBox);
+                                        iBox.appendChild(iLink);
+                                        let iSpan = document.createElement('span');
+                                        iSpan.classList.add('project_link');
                                         iBox.classList.add('project');
                                         iBox.classList.add('float');
                                         iBox.classList.add('auth');
+                                        iLink.appendChild(iSpan);
                                         let iTitle = document.createElement('div');
                                         iBox.appendChild(iTitle);
                                         iTitle.classList.add('project_title');
@@ -118,7 +122,7 @@
                                         iDesc.classList.add('project_description');
                                         iDesc.innerText =
                                             `Click me to view more info about ${i.filename}`;
-                                        main.appendChild(iLink);
+                                        main.appendChild(iBox);
                                     });
                                 });
                             } else {
