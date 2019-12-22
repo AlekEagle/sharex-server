@@ -76,9 +76,9 @@ actions.sync({ force: false }).then(() => {
 }).catch(err => {
     console.error('an error occurred while performing this operation', err);
 });
-class domains extends Sequelize.Model {};
+class domains extends Sequelize.Model { };
 domains.init({
-    domain: {type: Sequelize.STRING, primaryKey: true}
+    domain: { type: Sequelize.STRING, primaryKey: true }
 }, { sequelize });
 domains.sync({ force: false }).then(() => {
     console.log('Domains synced to database successfully!');
@@ -124,7 +124,7 @@ function authenticate(req, staff) {
             req.session.reset();
             reject();
             return;
-        }else {
+        } else {
             user.findOne({
                 where: {
                     id: req.session.user.id || 'none'
@@ -135,17 +135,17 @@ function authenticate(req, staff) {
                         if (staff) {
                             if (u.staff) {
                                 resolve();
-                            }else {
+                            } else {
                                 reject(true);
                             }
-                        }else {
+                        } else {
                             resolve();
                         }
-                    }else {
+                    } else {
                         req.session.reset();
                         reject(false);
                     }
-                }else {
+                } else {
                     req.session.reset();
                     reject(false);
                 }
@@ -158,7 +158,7 @@ app.use((req, res, next) => {
         res.set({
             'Cache-Control': 'no-cache'
         });
-    }else {
+    } else {
         res.set({
             'Cache-Control': 'public, max-age=172800'
         });
@@ -169,17 +169,17 @@ app.use((req, res, next) => {
     if (req.headers.host !== 'alekeagle.me' && !req.headers.host.includes('localhost') && !req.headers.host.includes('192.168.')) {
         res.redirect(301, 'https://alekeagle.me' + req.path);
         return;
-    }else {
+    } else {
         next();
     }
 });
 app.all('/api/', (req, res) => {
-    res.status(200).json({hello: 'world', version: '1.0.9'});
+    res.status(200).json({ hello: 'world', version: '1.0.9' });
 });
 app.get('/api/users/', (req, res) => {
     authenticate(req).then(() => {
         let count = parseInt(req.query.count) || 50,
-        offset = parseInt(req.query.offset) || 0;
+            offset = parseInt(req.query.offset) || 0;
         if (req.session.user.staff !== '') {
             user.findAll({
                 offset,
@@ -187,15 +187,15 @@ app.get('/api/users/', (req, res) => {
                 order: [['createdAt', 'DESC']]
             }).then(u => {
                 if (u !== null) {
-                    res.status(200).json(u.map(user => {return {id: user.id,username: user.username,displayName: user.displayName,staff: user.staff,createdAt: user.createdAt,bannedAt: user.bannedAt }}));
-                }else {
+                    res.status(200).json(u.map(user => { return { id: user.id, username: user.username, displayName: user.displayName, staff: user.staff, createdAt: user.createdAt, bannedAt: user.bannedAt } }));
+                } else {
                     res.sendStatus(204);
                 }
             }).catch(err => {
                 res.sendStatus(500);
                 console.error(err);
             });
-        }else {
+        } else {
             res.sendStatus(403);
         }
     }).catch(() => {
@@ -385,7 +385,7 @@ app.delete('/api/user/delete/', (req, res) => {
                     }
                 });
             }
-        }else if (password) {
+        } else if (password) {
             if (!req.session.user) {
                 res.sendStatus(401);
                 return;
@@ -428,7 +428,7 @@ app.delete('/api/user/delete/', (req, res) => {
                     console.error(err);
                 });
             }
-        }else {
+        } else {
             res.sendStatus(400);
             return;
         }
@@ -474,7 +474,7 @@ app.post('/api/user/login/', (req, res) => {
                     res.sendStatus(500);
                     console.error(err);
                 });
-            }else {
+            } else {
                 res.sendStatus(401);
                 return;
             }
@@ -491,7 +491,7 @@ app.get('/api/self/', (req, res) => {
                 id: req.session.user.id
             }
         }).then(u => {
-            let usr = {...u.toJSON()};
+            let usr = { ...u.toJSON() };
             delete usr.password;
             res.status(200).json(usr);
         })
@@ -512,7 +512,7 @@ app.post('/api/user/regentoken/', (req, res) => {
         if (!req.session.user) {
             res.sendStatus(401);
             return;
-        }else {
+        } else {
             let part1 = new Buffer.from(req.session.user.id);
             let part2 = new Buffer.from(new Date(Date.now()).toISOString());
             user.findOne({
@@ -527,9 +527,9 @@ app.post('/api/user/regentoken/', (req, res) => {
                     let now = new Date(Date.now());
                     bcrypt.compare(password, u.password).then(match => {
                         if (match) {
-                            u.update({apiToken: `${part1.toString('base64').replace(/==/g, '')}.${part2.toString('base64')}`}).then(u => {
+                            u.update({ apiToken: `${part1.toString('base64').replace(/==/g, '')}.${part2.toString('base64')}` }).then(u => {
                                 req.session.user = u;
-                                res.status(201).json({token: `${part1.toString('base64').replace(/==/g, '')}.${part2.toString('base64')}`});
+                                res.status(201).json({ token: `${part1.toString('base64').replace(/==/g, '')}.${part2.toString('base64')}` });
                                 actions.create({ type: 3, by: u.id, to: u.id }).then(() => {
                                     console.log('API Token refreshed');
                                 });
@@ -537,6 +537,8 @@ app.post('/api/user/regentoken/', (req, res) => {
                                 res.sendStatus(500);
                                 console.error(err);
                             });
+                        } else {
+                            res.sendStatus(401);
                         }
                     }, err => {
                         res.sendStatus(500);
@@ -547,7 +549,7 @@ app.post('/api/user/regentoken/', (req, res) => {
                 res.sendStatus(500);
                 console.error(err);
             });
-    
+
         }
     }).catch(() => {
         res.sendStatus(401);
@@ -556,18 +558,18 @@ app.post('/api/user/regentoken/', (req, res) => {
 });
 app.get('/api/user/save/', (req, res) => {
     authenticate(req).then(() => {
-        switch(req.query.type) {
+        switch (req.query.type) {
             case 'sharex':
                 res.set('Content-Disposition', 'attachment; filename="ShareX_Uploader.sxcu"');
                 res.status(200).send(`{"Version": "12.4.1","Name": "AlekEagle ShareX Uploader","DestinationType": "ImageUploader, TextUploader, FileUploader","RequestMethod": "POST","RequestURL": "https://alekeagle.me/upload/","Headers": {"Authorization": "${req.session.user.apiToken}"},"Body": "MultipartFormData","FileFormName": "file"}`);
-            break;
+                break;
             case 'sharenix':
                 res.set('Content-Disposition', 'attachment; filename="ShareNiX_Uploader.json"');
                 res.status(200).send(`{"Name": "AlekEagle ShareNiX Uploader","RequestType": "POST","Headers": {"Authorization": "${req.session.user.apiToken}"},"RequestURL": "https://alekeagle.me/upload/","FileFormName": "file","ResponseType": "Text"}`);
-            break;
+                break;
             default:
                 res.sendStatus(404);
-            break;
+                break;
         }
     }).catch(() => {
         res.sendStatus(401);
@@ -598,16 +600,16 @@ app.patch('/api/user/domain/', (req, res) => {
                     }
                 }).then(u => {
                     if (u !== null) {
-                        u.update({domain, subdomain}).then(u => {
+                        u.update({ domain, subdomain }).then(u => {
                             req.session.user = u;
-                            res.status(200).json({domain, subdomain});
+                            res.status(200).json({ domain, subdomain });
                         });
                     }
                 }).catch(err => {
                     res.sendStatus(500);
                     console.error(error);
                 });
-            }else {
+            } else {
                 res.sendStatus(400);
             }
         }).catch(err => {
@@ -621,8 +623,8 @@ app.patch('/api/user/domain/', (req, res) => {
 app.get('/api/user/uploads/', (req, res) => {
     authenticate(req).then(() => {
         let { id } = req.query,
-        count = parseInt(req.query.count) || 50,
-        offset = parseInt(req.query.offset) || 0;
+            count = parseInt(req.query.count) || 50,
+            offset = parseInt(req.query.offset) || 0;
         if (!id) {
             uploads.findAll({
                 offset,
@@ -633,12 +635,18 @@ app.get('/api/user/uploads/', (req, res) => {
                 }
             }).then(u => {
                 if (u !== null) {
-                    res.status(200).json(u);
-                }else {
+                    uploads.findAll({
+                        where: {
+                            userid: req.session.user.id
+                        }
+                    }).then(count => {
+                        res.status(200).json({ count: count.length, uploads: u });
+                    });
+                } else {
                     res.sendStatus(204);
                 }
             });
-        }else {
+        } else {
             if (req.session.user.staff !== '') {
                 uploads.findAll({
                     offset,
@@ -649,15 +657,21 @@ app.get('/api/user/uploads/', (req, res) => {
                     }
                 }).then(u => {
                     if (u.length !== 0) {
-                        res.status(200).json(u);
-                    }else {
+                        uploads.findAll({
+                            where: {
+                                userid: req.session.user.id
+                            }
+                        }).then(count => {
+                            res.status(200).json({ count: count.length, uploads: u });
+                        });
+                    } else {
                         res.sendStatus(404);
                     }
                 }).catch(err => {
                     res.sendStatus(500);
                     console.error(err);
                 });
-            }else {
+            } else {
                 res.sendStatus(401);
             }
         }
@@ -668,26 +682,26 @@ app.get('/api/user/uploads/', (req, res) => {
 app.get('/api/user/upload/', (req, res) => {
     authenticate(req).then(() => {
         let { name } = req.query;
-        if (!name) {res.sendStatus(400); return;}
+        if (!name) { res.sendStatus(400); return; }
         uploads.findOne({
             where: {
                 [Op.or]: [
-                    {filename: name}
+                    { filename: name }
                 ]
             }
         }).then(u => {
             if (u !== null) {
                 if (u.userid === req.session.user.id) {
                     res.status(200).json(u);
-                }else {
+                } else {
                     if (req.session.user.staff !== '') {
                         res.status(200).json(u);
-                    }else {
+                    } else {
                         res.sendStatus(401);
                         return;
                     }
                 }
-            }else {
+            } else {
                 res.sendStatus(404);
                 return;
             }
@@ -712,11 +726,11 @@ app.get('/api/user/uploads/count/', (req, res) => {
 app.delete('/api/user/uploads/delete/', (req, res) => {
     authenticate(req).then(() => {
         let { name } = req.body;
-        if (!name) {res.sendStatus(400); return;}
+        if (!name) { res.sendStatus(400); return; }
         uploads.findOne({
             where: {
                 [Op.or]: [
-                    {filename: name}
+                    { filename: name }
                 ]
             }
         }).then(u => {
@@ -726,7 +740,7 @@ app.delete('/api/user/uploads/delete/', (req, res) => {
                         if (err) {
                             res.sendStatus(500);
                             return;
-                        }else {
+                        } else {
                             u.destroy().then(() => {
                                 res.sendStatus(200);
                                 return;
@@ -736,12 +750,12 @@ app.delete('/api/user/uploads/delete/', (req, res) => {
                             });
                         }
                     });
-                }else if (req.session.user.staff !== ''){
+                } else if (req.session.user.staff !== '') {
                     fs.unlink(`uploads/${u.filename}`, err => {
                         if (err) {
                             res.sendStatus(500);
                             return;
-                        }else {
+                        } else {
                             u.destroy().then(() => {
                                 res.sendStatus(200);
                                 return;
@@ -751,11 +765,11 @@ app.delete('/api/user/uploads/delete/', (req, res) => {
                             });
                         }
                     });
-                }else {
+                } else {
                     res.sendStatus(401);
                     return;
                 }
-            }else {
+            } else {
                 res.sendStatus(404);
                 return;
             }
@@ -771,7 +785,7 @@ app.post('/upload/', upload.single('file'), (req, res) => {
     if (!req.headers.authorization) {
         res.sendStatus(401);
         return;
-    }else {
+    } else {
         user.findOne({
             where: {
                 apiToken: req.headers.authorization
@@ -789,18 +803,18 @@ app.post('/upload/', upload.single('file'), (req, res) => {
                     writeStream.end();
                     writeStream.destroy();
                     res.status(201).end(`https://${u.subdomain ? `${u.subdomain}.` : ''}${u.domain}/${filename}.txt`);
-                    uploads.create({filename: `${filename}.txt`, userid: u.id, size: req.body.file.length});
+                    uploads.create({ filename: `${filename}.txt`, userid: u.id, size: req.body.file.length });
                 } else {
                     let ft = fileType(req.file.buffer.slice(0, fileType.minimumBytes));
                     let filename = newString(10),
-                    writeStream = fs.createWriteStream(`${__dirname}/uploads/${filename}.${ft ? ft.ext : map[req.file.mimetype]}`);
+                        writeStream = fs.createWriteStream(`${__dirname}/uploads/${filename}.${ft ? ft.ext : map[req.file.mimetype]}`);
                     writeStream.write(req.file.buffer);
                     writeStream.end();
                     writeStream.destroy();
                     res.status(201).end(`https://${u.subdomain ? `${u.subdomain}.` : ''}${u.domain}/${filename}.${ft ? ft.ext : map[req.file.mimetype]}`);
-                    uploads.create({filename: `${filename}.${ft ? ft.ext : map[req.file.mimetype]}`, userid: u.id, size: req.file.size});
+                    uploads.create({ filename: `${filename}.${ft ? ft.ext : map[req.file.mimetype]}`, userid: u.id, size: req.file.size });
                 }
-            }else {
+            } else {
                 res.sendStatus(401);
                 return;
             }

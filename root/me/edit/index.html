@@ -140,11 +140,13 @@
                                         'Your Token has been refreshed! To get it, click me!';
                                     iDesc.appendChild(iDescText);
                                     iBox.addEventListener('click', () => {
-                                        iBox.remove();
-                                        help('Your new token has been put on your clipboard, the page will now refresh.');
-                                        setTimeout(() => {
-                                            window.location.reload();
-                                        }, 7000);
+                                        setTimeout(() =>{
+                                            iBox.remove();
+                                            help('Your new token has been put on your clipboard, the page will now refresh.');
+                                            setTimeout(() => {
+                                                window.location.reload();
+                                            }, 7000);
+                                        },50);
                                     }, false);
                                     iBox.setAttribute('data-clipboard-text', token.token)
                                     document.getElementById('projects').appendChild(iBox);
@@ -175,7 +177,7 @@
                     }).then(res => {
                         switch (res.status) {
                             case 200:
-                                help('You\'re account has been deleted, you\'ll be redirected to the home page soon.')
+                                help('Your account has been deleted, you\'ll be redirected to the home page soon.')
                                 setTimeout(() => window.location.href = '/', 7000);
                                 break;
                             case 401:
@@ -240,6 +242,7 @@
                 document.getElementById('password_del').addEventListener('keydown', delAcc, false);
                 document.getElementById('domain_sel').addEventListener('click', updateDomains, false);
                 document.getElementById('subdomain').addEventListener('keydown', updateDomains, false);
+                window.addEventListener('load', () => new ClipboardJS('.clipboard'), false);
 
             }
             document.addEventListener('readystatechange', e => {

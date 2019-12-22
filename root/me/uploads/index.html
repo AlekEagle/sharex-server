@@ -29,7 +29,8 @@
         </script>
         <script>
             let offset = 0,
-                main;
+                main,
+                size = '12px 0px 30px 0px';
 
             function createPopup(url, menu) {
                 popupWindow = window.open(url, 'popUpWindow',
@@ -38,15 +39,16 @@
             }
 
             function loadMore() {
+                document.getElementById('loadmore').style.margin = '0px';
+                document.getElementById('load_more').hidden = true;
+                document.getElementById('loading_ani').style.display = 'inline-block';
                 fetch(`/api/user/uploads/?offset=${offset}`, {
                     credentials: "include"
                 }).then(res => {
                     if (res.status === 200) {
                         res.json().then(json => {
+                            json = json.uploads;
                             offset += json.length;
-                            if (json.length === 0) {
-                                document.getElementById('load_more').hidden = true;
-                            }
                             json.forEach(i => {
                                 let iLink = document.createElement('a');
                                 iLink.href = `info/?name=${i.filename}`;
@@ -66,8 +68,15 @@
                                 iDesc.classList.add('project_description');
                                 iDesc.innerText =
                                     `Click me to view more info about ${i.filename}`;
-                                main.appendChild(iLink);
+                                main.appendChild(iBox);
                             });
+                            if (json.length === 0) {
+                                document.getElementById('loadmore').hidden = true;
+                            } else {
+                                document.getElementById('load_more').hidden = false;
+                                document.getElementById('loadmore').style.margin = size;
+                                document.getElementById('loading_ani').style.display = 'none';
+                            }
                         });
                     } else {
                         document.location.href =
@@ -78,6 +87,10 @@
 
             function init() {
                 main = document.getElementById('projects');
+                document.getElementById('loadmore').style.margin = '0px';
+                document.getElementById('load_more').hidden = true;
+                document.getElementById('loading_ani').style.display = 'inline-block';
+                main = document.getElementById('projects');
                 fetch('/api/authenticate/', {
                     credentials: 'include'
                 }).then(res => {
@@ -86,26 +99,22 @@
                             `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
                         return;
                     } else {
-                        fetch('/api/user/uploads/count/', {
-                            credentials: "include"
-                        }).then(res => res.text()).then(text => {
-                            document.getElementById('subtitle').innerHTML =
-                                `View and manage everything you've uploaded here.<br>You've uploaded ${text} files.`
-                        });
                         fetch('/api/user/uploads/', {
                             credentials: "include"
                         }).then(res => {
                             if (res.status === 200) {
                                 res.json().then(json => {
+                                    document.getElementById('subtitle').innerHTML =
+                                        `View and manage everything you've uploaded here.<br>You've uploaded ${json.count} files.`;
+                                    json = json.uploads;
                                     offset += json.length;
-                                    if (json.length === 0) {
-                                        document.getElementById('load_more').hidden = true;
-                                    }
                                     json.forEach(i => {
                                         let iLink = document.createElement('a');
                                         iLink.href = `info/?name=${i.filename}`;
                                         let iBox = document.createElement('div');
-                                        iLink.appendChild(iBox);
+                                        iBox.appendChild(iLink);
+                                        let iSpan = document.createElement('span');
+                                        iSpan.classList.add('project_link');
                                         iBox.classList.add('project');
                                         iBox.classList.add('float');
                                         iBox.classList.add('auth');
@@ -118,8 +127,16 @@
                                         iDesc.classList.add('project_description');
                                         iDesc.innerText =
                                             `Click me to view more info about ${i.filename}`;
-                                        main.appendChild(iLink);
+                                        main.appendChild(iBox);
                                     });
+                                    if (json.length === 0) {
+                                        document.getElementById('loadmore').hidden = true;
+                                    } else {
+                                        document.getElementById('load_more').hidden = false;
+                                        document.getElementById('loadmore').style.margin = size;
+                                        document.getElementById('loading_ani').style.display =
+                                            'none';
+                                    }
                                 });
                             } else {
                                 document.location.href =
@@ -157,8 +174,16 @@
 
         </div>
         <div class="footer_box">
-            <a href="javascript:loadMore()" id="load_more" class="footer_text">Load More..</a><br><br><a
-                href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>
+            <div class="loadmore" id="loadmore"><a href="javascript:loadMore()" hidden id="load_more"
+                    class="footer_text">Load More..</a>
+                <div id="loading_ani" class="lds-ellipsis">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+            <div class="cpyrit"><a href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a></div>
         </div>
     </body>
 

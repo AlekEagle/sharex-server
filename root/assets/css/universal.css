@@ -426,6 +426,14 @@ select {
   position: relative;
 }
 
+.footer_box .loadmore,.footer_box .cpyrit {
+  margin: 0px;
+}
+
+.loadmore {
+  overflow: hidden;
+}
+
 .project * {
   transition: 0.3s;
 }
