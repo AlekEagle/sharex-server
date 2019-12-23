@@ -32,7 +32,7 @@ self.addEventListener('activate', event => {
     caches.open(CACHE_NAME)
         .then(function (cache) {
             console.log('Opened cache');
-            return cache.addAll(urlsToCache);
+            cache.addAll(urlsToCache);
         })
     event.waitUntil(
         caches.keys().then(function (cacheNames) {
