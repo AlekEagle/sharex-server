@@ -58,7 +58,7 @@ self.addEventListener('fetch', function (event) {
                 return fetch(event.request).then(
                     function (response) {
                         // Check if we received a valid response
-                        if (!response || response.url.includes('/api/') || response.url.includes('google')) {
+                        if (!response || response.status !== 200 || response.type !== 'basic' || response.url.includes('/api/')) {
                             return response;
                         }
 
