@@ -1,4 +1,4 @@
-var CACHE_NAME = 'alekeagle-me-v1';
+var CACHE_NAME = 'alekeagle-me-v2';
 var urlsToCache = [
     '/me/',
     '/me/upload/',
@@ -8,7 +8,13 @@ var urlsToCache = [
     '/assets/js/memory.js',
     '/assets/images/circle.png',
     '/assets/images/me_irl.png',
-    '/assets/images/empty.gif'
+    '/assets/images/empty.gif',
+    '/assets/js/snackbar.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js',
+    '/favicon.ico',
+    'https://fonts.googleapis.com/css?family=K2D',
+    'https://fonts.gstatic.com/s/k2d/v3/J7aTnpF2V0EjZKUsrLc.woff2',
+    'https://fonts.gstatic.com/s/k2d/v3/J7aTnpF2V0EjcKUs.woff2'
 ];
 
 self.addEventListener('install', function (event) {

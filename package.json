@@ -18,7 +18,8 @@
     "pg": "^7.12.1",
     "pg-hstore": "^2.3.3",
     "request": "^2.88.0",
-    "sequelize": "^5.19.6"
+    "sequelize": "^5.19.6",
+    "web-push": "^3.4.3"
   },
   "devDependencies": {},
   "scripts": {

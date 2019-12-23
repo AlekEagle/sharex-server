@@ -7,6 +7,7 @@ const fs = require('fs'),
     Sequelize = require('sequelize'),
     session = require('client-sessions'),
     fileType = require('file-type'),
+    webpush = require('web-push'),
     upload = multer(),
     Op = Sequelize.Op,
     ms = require('ms'),
@@ -34,10 +35,15 @@ const fs = require('fs'),
     port = process.argv[2] || 3000;
 
 dotenv.config();
-const sequelize = new Sequelize(`postgres://${process.env.SERVERUSERNAME}:${process.env.SERVERPASSWORD}@${process.env.SERVERIP}:5432/${process.env.SERVERDB}`, { logging: false });
-class user extends Sequelize.Model { };
+const sequelize = new Sequelize(`postgres://${process.env.SERVERUSERNAME}:${process.env.SERVERPASSWORD}@${process.env.SERVERIP}:5432/${process.env.SERVERDB}`, {
+    logging: false
+});
+class user extends Sequelize.Model {};
 user.init({
-    id: { type: Sequelize.STRING, primaryKey: true },
+    id: {
+        type: Sequelize.STRING,
+        primaryKey: true
+    },
     username: Sequelize.STRING(24),
     displayName: Sequelize.STRING,
     email: Sequelize.STRING,
@@ -46,45 +52,71 @@ user.init({
     apiToken: Sequelize.STRING,
     domain: Sequelize.STRING,
     subdomain: Sequelize.STRING,
-    bannedAt: Sequelize.DATE
-}, { sequelize });
-user.sync({ force: false }).then(() => {
+    bannedAt: Sequelize.DATE,
+    pushSubEndpoint: Sequelize.STRING(2000),
+    pushSubP256DH: Sequelize.STRING(2000),
+    pushSubAuth: Sequelize.STRING(2000)
+}, {
+    sequelize
+});
+user.sync({
+    force: false
+}).then(() => {
     console.log('Users synced to database successfully!');
 }).catch(err => {
     console.error('an error occurred while performing this operation', err);
 });
-class uploads extends Sequelize.Model { };
+class uploads extends Sequelize.Model {};
 uploads.init({
-    filename: { type: Sequelize.STRING, primaryKey: true },
+    filename: {
+        type: Sequelize.STRING,
+        primaryKey: true
+    },
     userid: Sequelize.STRING,
     size: Sequelize.INTEGER
-}, { sequelize });
-uploads.sync({ force: false }).then(() => {
+}, {
+    sequelize
+});
+uploads.sync({
+    force: false
+}).then(() => {
     console.log('Uploads synced to database successfully!');
 }).catch(err => {
     console.error('an error occurred while performing this operation', err);
 });
-class actions extends Sequelize.Model { };
+class actions extends Sequelize.Model {};
 actions.init({
     type: Sequelize.INTEGER,
     by: Sequelize.STRING,
     to: Sequelize.STRING,
     addInfo: Sequelize.STRING(2000)
-}, { sequelize });
-actions.sync({ force: false }).then(() => {
+}, {
+    sequelize
+});
+actions.sync({
+    force: false
+}).then(() => {
     console.log('Actions synced to database successfully!');
 }).catch(err => {
     console.error('an error occurred while performing this operation', err);
 });
-class domains extends Sequelize.Model { };
+class domains extends Sequelize.Model {};
 domains.init({
-    domain: { type: Sequelize.STRING, primaryKey: true }
-}, { sequelize });
-domains.sync({ force: false }).then(() => {
+    domain: {
+        type: Sequelize.STRING,
+        primaryKey: true
+    }
+}, {
+    sequelize
+});
+domains.sync({
+    force: false
+}).then(() => {
     console.log('Domains synced to database successfully!');
 }).catch(err => {
     console.error('an error occurred while performing this operation', err);
 });
+
 function newString(length) {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
@@ -118,6 +150,9 @@ app.use(session({
         path: '/'
     }
 }));
+webpush.setGCMAPIKey(process.env.GCMAPIKEY);
+webpush.setVapidDetails('mailto: notifications@alekeagle.com', process.env.VAPIDPUB, process.env.VAPIDPRIV);
+
 function authenticate(req, staff) {
     return new Promise((resolve, reject) => {
         if (!req.session.user) {
@@ -174,7 +209,10 @@ app.use((req, res, next) => {
     }
 });
 app.all('/api/', (req, res) => {
-    res.status(200).json({ hello: 'world', version: '1.0.9' });
+    res.status(200).json({
+        hello: 'world',
+        version: '1.0.9'
+    });
 });
 app.get('/api/users/', (req, res) => {
     authenticate(req).then(() => {
@@ -184,10 +222,21 @@ app.get('/api/users/', (req, res) => {
             user.findAll({
                 offset,
                 limit: count,
-                order: [['createdAt', 'DESC']]
+                order: [
+                    ['createdAt', 'DESC']
+                ]
             }).then(u => {
                 if (u !== null) {
-                    res.status(200).json(u.map(user => { return { id: user.id, username: user.username, displayName: user.displayName, staff: user.staff, createdAt: user.createdAt, bannedAt: user.bannedAt } }));
+                    res.status(200).json(u.map(user => {
+                        return {
+                            id: user.id,
+                            username: user.username,
+                            displayName: user.displayName,
+                            staff: user.staff,
+                            createdAt: user.createdAt,
+                            bannedAt: user.bannedAt
+                        }
+                    }));
                 } else {
                     res.sendStatus(204);
                 }
@@ -211,8 +260,17 @@ app.get('/api/user/', (req, res) => {
                     id: req.query.id
                 }
             }).then(user => {
-                if (user === undefined) res.status(404).json({ error: 'Not found' });
-                else res.status(200).json({ id: user.id, username: user.username, displayName: user.displayName, staff: user.staff, createdAt: user.createdAt, bannedAt: user.bannedAt });
+                if (user === undefined) res.status(404).json({
+                    error: 'Not found'
+                });
+                else res.status(200).json({
+                    id: user.id,
+                    username: user.username,
+                    displayName: user.displayName,
+                    staff: user.staff,
+                    createdAt: user.createdAt,
+                    bannedAt: user.bannedAt
+                });
             }, err => {
                 res.sendStatus(500);
                 console.error(err);
@@ -223,7 +281,11 @@ app.get('/api/user/', (req, res) => {
     });
 });
 app.post('/api/user/create/', (req, res) => {
-    let { name, email, password } = req.body;
+    let {
+        name,
+        email,
+        password
+    } = req.body;
     if (!name || !email || !password) {
         res.sendStatus(400);
         return;
@@ -231,9 +293,12 @@ app.post('/api/user/create/', (req, res) => {
         let username = name.toLowerCase();
         user.findOne({
             where: {
-                [Op.or]: [
-                    { username },
-                    { email }
+                [Op.or]: [{
+                        username
+                    },
+                    {
+                        email
+                    }
                 ]
             }
         }).then(u => {
@@ -242,10 +307,26 @@ app.post('/api/user/create/', (req, res) => {
                 let part1 = new Buffer.from(now.getTime().toString());
                 let part2 = new Buffer.from(new Date(Date.now()).toISOString());
                 bcrypt.hash(password, Math.floor(Math.random() * 10)).then(hashedPass => {
-                    user.create({ id: now.getTime(), username, domain: 'alekeagle.me', subdomain: '', displayName: name, email, createdAt: now, updatedAt: now, password: hashedPass, staff: '', apiToken: `${part1.toString('base64').replace(/==/g, '')}.${part2.toString('base64')}` }).then(newUser => {
+                    user.create({
+                        id: now.getTime(),
+                        username,
+                        domain: 'alekeagle.me',
+                        subdomain: '',
+                        displayName: name,
+                        email,
+                        createdAt: now,
+                        updatedAt: now,
+                        password: hashedPass,
+                        staff: '',
+                        apiToken: `${part1.toString('base64').replace(/==/g, '')}.${part2.toString('base64')}`
+                    }).then(newUser => {
                         req.session.user = newUser;
                         res.status(201).json(newUser);
-                        actions.create({ type: 1, by: newUser.id, to: newUser.id }).then(() => {
+                        actions.create({
+                            type: 1,
+                            by: newUser.id,
+                            to: newUser.id
+                        }).then(() => {
                             console.log('New user created');
                         });
                     }, err => {
@@ -268,7 +349,13 @@ app.post('/api/user/create/', (req, res) => {
 });
 app.put('/api/user/update/', (req, res) => {
     authenticate(req).then(() => {
-        let { email, name, password, newPassword, id } = req.body;
+        let {
+            email,
+            name,
+            password,
+            newPassword,
+            id
+        } = req.body;
         if (!(email || name || newPassword)) {
             res.sendStatus(400);
             return;
@@ -290,8 +377,18 @@ app.put('/api/user/update/', (req, res) => {
                         } else {
                             let now = new Date(Date.now());
                             bcrypt.hash(newPassword || password, Math.floor(Math.random() * 10)).then(hashedPass => {
-                                u.update({ email: email || u.email, displayName: name || u.displayName, username: username || u.username, updatedAt: now, password: hashedPass }).then(() => {
-                                    actions.create({ type: 2, by: req.session.user.id, to: id }).then(() => {
+                                u.update({
+                                    email: email || u.email,
+                                    displayName: name || u.displayName,
+                                    username: username || u.username,
+                                    updatedAt: now,
+                                    password: hashedPass
+                                }).then(() => {
+                                    actions.create({
+                                        type: 2,
+                                        by: req.session.user.id,
+                                        to: id
+                                    }).then(() => {
                                         console.log('User updated');
                                     });
                                     res.sendStatus(200);
@@ -317,9 +414,12 @@ app.put('/api/user/update/', (req, res) => {
                 if (req.session.user) {
                     user.findOne({
                         where: {
-                            [Op.or]: [
-                                { username: req.session.user.username },
-                                { email: req.session.user.username }
+                            [Op.or]: [{
+                                    username: req.session.user.username
+                                },
+                                {
+                                    email: req.session.user.username
+                                }
                             ]
                         }
                     }).then(u => {
@@ -328,9 +428,19 @@ app.put('/api/user/update/', (req, res) => {
                             bcrypt.compare(password, u.password).then(match => {
                                 if (match) {
                                     bcrypt.hash(newPassword ? newPassword : password, Math.floor(Math.random() * 10)).then(hashedPass => {
-                                        u.update({ email: email || u.email, displayName: name || u.displayName, username: username || u.username, updatedAt: now, password: hashedPass }).then(updatedUser => {
+                                        u.update({
+                                            email: email || u.email,
+                                            displayName: name || u.displayName,
+                                            username: username || u.username,
+                                            updatedAt: now,
+                                            password: hashedPass
+                                        }).then(updatedUser => {
                                             req.session.user = updatedUser;
-                                            actions.create({ type: 2, by: updatedUser.id, to: updatedUser.id }).then(() => {
+                                            actions.create({
+                                                type: 2,
+                                                by: updatedUser.id,
+                                                to: updatedUser.id
+                                            }).then(() => {
                                                 console.log('User updated');
                                             });
                                             res.sendStatus(200);
@@ -364,7 +474,10 @@ app.put('/api/user/update/', (req, res) => {
 });
 app.delete('/api/user/delete/', (req, res) => {
     authenticate(req).then(() => {
-        let { password, id } = req.body;
+        let {
+            password,
+            id
+        } = req.body;
         if (id) {
             if (req.session.user.staff === '') {
                 res.sendStatus(401);
@@ -377,7 +490,11 @@ app.delete('/api/user/delete/', (req, res) => {
                 }).then(u => {
                     if (u !== null) {
                         u.destroy().then(() => {
-                            actions.create({ type: 4, by: req.session.user.id, to: id }).then(() => {
+                            actions.create({
+                                type: 4,
+                                by: req.session.user.id,
+                                to: id
+                            }).then(() => {
                                 console.log('User Deleted');
                                 res.sendStatus(200);
                             });
@@ -392,9 +509,12 @@ app.delete('/api/user/delete/', (req, res) => {
             } else {
                 user.findOne({
                     where: {
-                        [Op.or]: [
-                            { username: req.session.user.username },
-                            { email: req.session.user.username }
+                        [Op.or]: [{
+                                username: req.session.user.username
+                            },
+                            {
+                                email: req.session.user.username
+                            }
                         ]
                     }
                 }).then(u => {
@@ -402,7 +522,11 @@ app.delete('/api/user/delete/', (req, res) => {
                         bcrypt.compare(password, u.password).then(match => {
                             if (match) {
                                 u.destroy().then(() => {
-                                    actions.create({ type: 4, by: req.session.user.id, to: req.session.user.id }).then(() => {
+                                    actions.create({
+                                        type: 4,
+                                        by: req.session.user.id,
+                                        to: req.session.user.id
+                                    }).then(() => {
                                         console.log('User Deleted');
                                     });
                                     req.session.reset();
@@ -445,7 +569,10 @@ app.get('/api/user/logout/', (req, res) => {
     res.sendStatus(200);
 });
 app.post('/api/user/login/', (req, res) => {
-    let { name, password } = req.body;
+    let {
+        name,
+        password
+    } = req.body;
     if (!name || !password) {
         res.sendStatus(400);
         return;
@@ -453,16 +580,23 @@ app.post('/api/user/login/', (req, res) => {
         name = name.toLowerCase();
         user.findOne({
             where: {
-                [Op.or]: [
-                    { username: name },
-                    { email: name }
+                [Op.or]: [{
+                        username: name
+                    },
+                    {
+                        email: name
+                    }
                 ]
             }
         }).then(u => {
             if (u !== null) {
                 bcrypt.compare(password, u.password).then(match => {
                     if (match) {
-                        actions.create({ type: 5, by: u.id, to: u.id }).then(() => {
+                        actions.create({
+                            type: 5,
+                            by: u.id,
+                            to: u.id
+                        }).then(() => {
                             console.log('User login');
                         });
                         req.session.user = u;
@@ -491,7 +625,9 @@ app.get('/api/self/', (req, res) => {
                 id: req.session.user.id
             }
         }).then(u => {
-            let usr = { ...u.toJSON() };
+            let usr = {
+                ...u.toJSON()
+            };
             delete usr.password;
             res.status(200).json(usr);
         })
@@ -508,7 +644,9 @@ app.get('/api/authenticate/', (req, res) => {
 });
 app.post('/api/user/regentoken/', (req, res) => {
     authenticate(req).then(() => {
-        let { password } = req.body;
+        let {
+            password
+        } = req.body;
         if (!req.session.user) {
             res.sendStatus(401);
             return;
@@ -517,9 +655,12 @@ app.post('/api/user/regentoken/', (req, res) => {
             let part2 = new Buffer.from(new Date(Date.now()).toISOString());
             user.findOne({
                 where: {
-                    [Op.or]: [
-                        { username: req.session.user.username },
-                        { email: req.session.user.username }
+                    [Op.or]: [{
+                            username: req.session.user.username
+                        },
+                        {
+                            email: req.session.user.username
+                        }
                     ]
                 }
             }).then(u => {
@@ -527,10 +668,18 @@ app.post('/api/user/regentoken/', (req, res) => {
                     let now = new Date(Date.now());
                     bcrypt.compare(password, u.password).then(match => {
                         if (match) {
-                            u.update({ apiToken: `${part1.toString('base64').replace(/==/g, '')}.${part2.toString('base64')}` }).then(u => {
+                            u.update({
+                                apiToken: `${part1.toString('base64').replace(/==/g, '')}.${part2.toString('base64')}`
+                            }).then(u => {
                                 req.session.user = u;
-                                res.status(201).json({ token: `${part1.toString('base64').replace(/==/g, '')}.${part2.toString('base64')}` });
-                                actions.create({ type: 3, by: u.id, to: u.id }).then(() => {
+                                res.status(201).json({
+                                    token: `${part1.toString('base64').replace(/==/g, '')}.${part2.toString('base64')}`
+                                });
+                                actions.create({
+                                    type: 3,
+                                    by: u.id,
+                                    to: u.id
+                                }).then(() => {
                                     console.log('API Token refreshed');
                                 });
                             }, err => {
@@ -582,7 +731,10 @@ app.get('/api/domains/', (req, res) => {
 });
 app.patch('/api/user/domain/', (req, res) => {
     authenticate(req).then(() => {
-        let { domain, subdomain } = req.body;
+        let {
+            domain,
+            subdomain
+        } = req.body;
         subdomain = subdomain.replace(/ /g, '-');
         if (domain === 'alekeagle.com' && req.session.user.staff === '') {
             res.sendStatus(403);
@@ -600,9 +752,15 @@ app.patch('/api/user/domain/', (req, res) => {
                     }
                 }).then(u => {
                     if (u !== null) {
-                        u.update({ domain, subdomain }).then(u => {
+                        u.update({
+                            domain,
+                            subdomain
+                        }).then(u => {
                             req.session.user = u;
-                            res.status(200).json({ domain, subdomain });
+                            res.status(200).json({
+                                domain,
+                                subdomain
+                            });
                         });
                     }
                 }).catch(err => {
@@ -622,14 +780,18 @@ app.patch('/api/user/domain/', (req, res) => {
 });
 app.get('/api/user/uploads/', (req, res) => {
     authenticate(req).then(() => {
-        let { id } = req.query,
+        let {
+            id
+        } = req.query,
             count = parseInt(req.query.count) || 50,
             offset = parseInt(req.query.offset) || 0;
         if (!id) {
             uploads.findAll({
                 offset,
                 limit: count,
-                order: [['updatedAt', 'DESC']],
+                order: [
+                    ['updatedAt', 'DESC']
+                ],
                 where: {
                     userid: req.session.user.id
                 }
@@ -640,7 +802,10 @@ app.get('/api/user/uploads/', (req, res) => {
                             userid: req.session.user.id
                         }
                     }).then(count => {
-                        res.status(200).json({ count: count.length, uploads: u });
+                        res.status(200).json({
+                            count: count.length,
+                            uploads: u
+                        });
                     });
                 } else {
                     res.sendStatus(204);
@@ -651,7 +816,9 @@ app.get('/api/user/uploads/', (req, res) => {
                 uploads.findAll({
                     offset,
                     limit: count,
-                    order: [['updatedAt', 'DESC']],
+                    order: [
+                        ['updatedAt', 'DESC']
+                    ],
                     where: {
                         userid: id
                     }
@@ -662,7 +829,10 @@ app.get('/api/user/uploads/', (req, res) => {
                                 userid: req.session.user.id
                             }
                         }).then(count => {
-                            res.status(200).json({ count: count.length, uploads: u });
+                            res.status(200).json({
+                                count: count.length,
+                                uploads: u
+                            });
                         });
                     } else {
                         res.sendStatus(404);
@@ -681,13 +851,18 @@ app.get('/api/user/uploads/', (req, res) => {
 });
 app.get('/api/user/upload/', (req, res) => {
     authenticate(req).then(() => {
-        let { name } = req.query;
-        if (!name) { res.sendStatus(400); return; }
+        let {
+            name
+        } = req.query;
+        if (!name) {
+            res.sendStatus(400);
+            return;
+        }
         uploads.findOne({
             where: {
-                [Op.or]: [
-                    { filename: name }
-                ]
+                [Op.or]: [{
+                    filename: name
+                }]
             }
         }).then(u => {
             if (u !== null) {
@@ -725,13 +900,18 @@ app.get('/api/user/uploads/count/', (req, res) => {
 })
 app.delete('/api/user/uploads/delete/', (req, res) => {
     authenticate(req).then(() => {
-        let { name } = req.body;
-        if (!name) { res.sendStatus(400); return; }
+        let {
+            name
+        } = req.body;
+        if (!name) {
+            res.sendStatus(400);
+            return;
+        }
         uploads.findOne({
             where: {
-                [Op.or]: [
-                    { filename: name }
-                ]
+                [Op.or]: [{
+                    filename: name
+                }]
             }
         }).then(u => {
             if (u !== null) {
@@ -781,6 +961,40 @@ app.delete('/api/user/uploads/delete/', (req, res) => {
         res.sendStatus(401);
     });
 });
+app.get('/api/appsubkey/', (req, res) => {
+    authenticate(req).then(() => {
+        res.status(200).json({
+            applicationServerKey: process.env.VAPIDPUB
+        });
+    }).catch(() => {
+        res.sendStatus(401);
+    });
+});
+app.post('/api/user/subscribe/', (req, res) => {
+    authenticate(req).then(() => {
+        user.findOne({
+            where: {
+                id: req.session.user.id
+            }
+        }).then(u => {
+            u.update({pushSubEndpoint: req.body.endpoint, pushSubP256DH: req.body.keys.p256dh, pushSubAuth: req.body.keys.auth}).then
+        })
+    }).catch(() => {
+        res.sendStatus(401);
+    });
+});
+app.get('/api/user/testsubscription/', (req, res) => {
+    authenticate(req).then(() => {
+        user.findOne({
+            where: {
+                id: req.session.user.id
+            }
+        }).then(u => {
+            res.sendStatus(200);
+            webpush.sendNotification({endpoint: u.pushSubEndpoint, keys: {p256dh: u.pushSubP256DH, auth: u.pushSubAuth}}, 'gay')
+        })
+    })
+});
 app.post('/upload/', upload.single('file'), (req, res) => {
     if (!req.headers.authorization) {
         res.sendStatus(401);
@@ -803,7 +1017,11 @@ app.post('/upload/', upload.single('file'), (req, res) => {
                     writeStream.end();
                     writeStream.destroy();
                     res.status(201).end(`https://${u.subdomain ? `${u.subdomain}.` : ''}${u.domain}/${filename}.txt`);
-                    uploads.create({ filename: `${filename}.txt`, userid: u.id, size: req.body.file.length });
+                    uploads.create({
+                        filename: `${filename}.txt`,
+                        userid: u.id,
+                        size: req.body.file.length
+                    });
                 } else {
                     let ft = fileType(req.file.buffer.slice(0, fileType.minimumBytes));
                     let filename = newString(10),
@@ -812,7 +1030,11 @@ app.post('/upload/', upload.single('file'), (req, res) => {
                     writeStream.end();
                     writeStream.destroy();
                     res.status(201).end(`https://${u.subdomain ? `${u.subdomain}.` : ''}${u.domain}/${filename}.${ft ? ft.ext : map[req.file.mimetype]}`);
-                    uploads.create({ filename: `${filename}.${ft ? ft.ext : map[req.file.mimetype]}`, userid: u.id, size: req.file.size });
+                    uploads.create({
+                        filename: `${filename}.${ft ? ft.ext : map[req.file.mimetype]}`,
+                        userid: u.id,
+                        size: req.file.size
+                    });
                 }
             } else {
                 res.sendStatus(401);
