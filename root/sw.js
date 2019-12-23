@@ -17,20 +17,19 @@ var urlsToCache = [
 ];
 
 self.addEventListener('install', function (event) {
-    async function install() {
-        await caches.keys().then(cacheNames => {
-            if (cacheNames.includes(CACHE_NAME)) {
-                return caches.delete(CACHE_NAME);
-            }
-        });
 
-        await caches.open(CACHE_NAME)
-            .then(function (cache) {
-                console.log('Opened cache');
-                return cache.addAll(urlsToCache);
-            });
-    }
-    event.waitUntil(install);
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            if (cacheNames.includes(CACHE_NAME)) {
+                caches.delete(CACHE_NAME).then(() => {
+                    caches.open(CACHE_NAME).then(function (cache) {
+                        console.log('Opened cache');
+                        return cache.addAll(urlsToCache);
+                    });
+                })
+            }
+        })
+    );
 });
 
 self.addEventListener('activate', event => {
