@@ -29,6 +29,17 @@
             gtag('config', 'UA-135044771-3');
         </script>
         <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                    navigator.serviceWorker.register('/sw.js').then(function (registration) {
+                        // Registration was successful
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }, function (err) {
+                        // registration failed :(
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+                });
+            }
             function createPopup(url, menu) {
                 popupWindow = window.open(url, 'popUpWindow',
                     `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
