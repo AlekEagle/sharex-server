@@ -29,6 +29,11 @@ self.addEventListener('install', function (event) {
 });
 
 self.addEventListener('activate', event => {
+    caches.open(CACHE_NAME)
+        .then(function (cache) {
+            console.log('Opened cache');
+            return cache.addAll(urlsToCache);
+        })
     event.waitUntil(
         caches.keys().then(function (cacheNames) {
             return Promise.all(
@@ -39,13 +44,6 @@ self.addEventListener('activate', event => {
                 })
             );
         })
-    );
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(function (cache) {
-                console.log('Opened cache');
-                return cache.addAll(urlsToCache);
-            })
     );
 })
 
