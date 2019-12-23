@@ -18,6 +18,11 @@ var urlsToCache = [
 ];
 
 self.addEventListener('install', function (event) {
+    caches.keys().then(cacheNames => {
+        if (cacheNames.includes(CACHE_NAME)) {
+            caches.delete(CACHE_NAME);
+        }
+    });
     // Perform install steps
     event.waitUntil(
         caches.open(CACHE_NAME)
@@ -29,11 +34,6 @@ self.addEventListener('install', function (event) {
 });
 
 self.addEventListener('activate', event => {
-    caches.open(CACHE_NAME)
-        .then(function (cache) {
-            console.log('Opened cache');
-            cache.addAll(urlsToCache);
-        })
     event.waitUntil(
         caches.keys().then(function (cacheNames) {
             return Promise.all(
