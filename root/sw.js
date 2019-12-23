@@ -3,7 +3,8 @@ var urlsToCache = [
     'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js',
     'https://fonts.googleapis.com/css?family=K2D',
     'https://fonts.gstatic.com/s/k2d/v3/J7aTnpF2V0EjZKUsrLc.woff2',
-    'https://fonts.gstatic.com/s/k2d/v3/J7aTnpF2V0EjcKUs.woff2', '/',
+    'https://fonts.gstatic.com/s/k2d/v3/J7aTnpF2V0EjcKUs.woff2',
+    '/',
     '/me/',
     '/me/upload/',
     '/me/uploads/',
@@ -24,19 +25,12 @@ self.addEventListener('install', function (event) {
                 caches.delete(CACHE_NAME).then(() => {
                     caches.open(CACHE_NAME).then(function (cache) {
                         console.log('Opened cache');
-                        return cache.addAll(urlsToCache);
+                        return cache.addAll(urlsToCache.map(url => {
+                            return new Request(url, { mode: 'no-cors' });
+                        }));
                     });
                 })
             }
-        })
-    );
-});
-
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then(function (cache) {
-            console.log('Opened cache');
-            return cache.addAll(urlsToCache);
         })
     );
 });
