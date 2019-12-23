@@ -59,7 +59,7 @@ self.addEventListener('fetch', function (event) {
                 return fetch(event.request).then(
                     function (response) {
                         // Check if we received a valid response
-                        if (!response || response.url.includes('/api/')) {
+                        if (!response || response.url.includes('/api/') || response.url.includes('analytics')) {
                             return response;
                         }
 
