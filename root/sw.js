@@ -1,51 +1,38 @@
 var CACHE_NAME = 'alekeagle-me-v1';
 var urlsToCache = [
-    'https://alekeagle.me/',
-    'https://alekeagle.me/me/',
-    'https://alekeagle.me/me/upload/',
-    'https://alekeagle.me/me/uploads/',
-    'https://alekeagle.me/me/uploads/info/',
-    'https://alekeagle.me/assets/css/universal.css',
-    'https://alekeagle.me/assets/js/memory.js',
-    'https://alekeagle.me/assets/images/circle.png',
-    'https://alekeagle.me/assets/images/me_irl.png',
-    'https://alekeagle.me/assets/images/empty.gif',
-    'https://alekeagle.me/assets/js/snackbar.js',
+    '/',
+    '/me/',
+    '/me/upload/',
+    '/me/uploads/',
+    '/me/uploads/info/',
+    '/assets/css/universal.css',
+    '/assets/js/memory.js',
+    '/assets/images/circle.png',
+    '/assets/images/me_irl.png',
+    '/assets/images/empty.gif',
+    '/assets/js/snackbar.js',
     'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js',
+    '/favicon.ico',
     'https://fonts.googleapis.com/css?family=K2D',
     'https://fonts.gstatic.com/s/k2d/v3/J7aTnpF2V0EjZKUsrLc.woff2',
     'https://fonts.gstatic.com/s/k2d/v3/J7aTnpF2V0EjcKUs.woff2'
 ];
 
 self.addEventListener('install', function (event) {
-
+    // Perform install steps
     event.waitUntil(
         caches.keys().then(cacheNames => {
             if (cacheNames.includes(CACHE_NAME)) {
                 caches.delete(CACHE_NAME).then(() => {
                     caches.open(CACHE_NAME).then(function (cache) {
                         console.log('Opened cache');
-                        cache.add(urlsToCache[0])
+                        return cache.addAll(urlsToCache);
                     });
                 })
             }
         })
     );
 });
-
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(function (cacheNames) {
-            return Promise.all(
-                cacheNames.map(function (cacheName) {
-                    if (cacheName === CACHE_NAME) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
-    );
-})
 
 self.addEventListener('fetch', function (event) {
     event.respondWith(
