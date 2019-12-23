@@ -1,4 +1,4 @@
-var CACHE_NAME = 'alekeagle-me-v3';
+var CACHE_NAME = 'alekeagle-me-v1';
 var urlsToCache = [
     '/me/',
     '/me/upload/',
@@ -11,7 +11,6 @@ var urlsToCache = [
     '/assets/images/empty.gif',
     '/assets/js/snackbar.js',
     'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js',
-    '/favicon.ico',
     'https://fonts.googleapis.com/css?family=K2D',
     'https://fonts.gstatic.com/s/k2d/v3/J7aTnpF2V0EjZKUsrLc.woff2',
     'https://fonts.gstatic.com/s/k2d/v3/J7aTnpF2V0EjcKUs.woff2'
