@@ -1,4 +1,4 @@
-var CACHE_NAME = 'alekeagle-me-v2';
+var CACHE_NAME = 'alekeagle-me-v3';
 var urlsToCache = [
     '/me/',
     '/me/upload/',
