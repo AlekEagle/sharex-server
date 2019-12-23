@@ -1,6 +1,9 @@
 var CACHE_NAME = 'alekeagle-me-v1';
 var urlsToCache = [
-    '/',
+    '/me/',
+    '/me/upload/',
+    '/me/uploads/',
+    '/me/uploads/info/',
     '/assets/css/universal.css',
     '/assets/js/memory.js',
     '/assets/images/circle.png',

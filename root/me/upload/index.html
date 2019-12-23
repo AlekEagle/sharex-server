@@ -19,6 +19,7 @@
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-3"></script>
         <script defer src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js"></script>
+        <script defer src="/assets/js/snackbar.js"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
 
@@ -126,14 +127,6 @@
                 });
             }
 
-            function help() {
-                var x = document.getElementById("snackbar");
-                x.className = "show";
-                setTimeout(function () {
-                    x.className = x.className.replace("show", "");
-                }, 7000);
-            }
-
             function FileDragHover(e) {
                 e.stopPropagation();
                 e.preventDefault();
@@ -212,6 +205,8 @@
                     } else {
                         document.getElementById('send').addEventListener('click', uploadFile, false);
                     }
+                }).catch(err => {
+                    help('It appears you are offline. Please try again later.')
                 });
             }
             document.addEventListener('readystatechange', e => {

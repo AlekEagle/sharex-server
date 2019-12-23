@@ -72,6 +72,8 @@
                                 `Welcome Back, ${json.displayName}.`;
                         });
                     }
+                }).catch(err => {
+                    help('It appears you are offline. Please try again later.')
                 });
 
             }
@@ -130,6 +132,7 @@
         <div class="footer_box">
             <a href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>
         </div>
+        <div id="snackbar"></div>
     </body>
 
 </html>

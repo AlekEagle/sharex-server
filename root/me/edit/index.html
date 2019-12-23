@@ -19,6 +19,7 @@
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-3"></script>
         <script defer src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js"></script>
+        <script defer src="/assets/js/snackbar.js"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
 
@@ -64,6 +65,8 @@
                                 `Username: ${json.displayName}<br>Email: ${json.email}<br>Password: No Peeking!`;
                         });
                     }
+                }).catch(err => {
+                    help('It appears you are offline. Please try again later.')
                 });
 
                 fetch('/api/domains/', {
@@ -204,15 +207,6 @@
                                     'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
                         }
                     });
-                }
-
-                function help(text) {
-                    var x = document.getElementById("snackbar");
-                    x.innerText = text;
-                    x.className = "show";
-                    timeout = setTimeout(function () {
-                        x.className = x.className.replace("show", "");
-                    }, 7000);
                 }
 
                 function updateDomains(e) {
