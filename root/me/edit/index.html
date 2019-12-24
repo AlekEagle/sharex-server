@@ -35,7 +35,8 @@
                 window.addEventListener('load', function () {
                     navigator.serviceWorker.register('/sw.js').then(function (registration) {
                         // Registration was successful
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                        console.log('ServiceWorker registration successful with scope: ', registration
+                            .scope);
                     }, function (err) {
                         // registration failed :(
                         console.log('ServiceWorker registration failed: ', err);
@@ -43,6 +44,7 @@
                 });
             }
             let timeout;
+
             function createPopup(url, menu) {
                 popupWindow = window.open(url, 'popUpWindow',
                     `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
@@ -122,6 +124,51 @@
                     });
                 }
 
+                function registerPushSub() {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            fetch('/api/appsubkey/', {
+                                credentials: "include"
+                            }).then(res => {
+                                if (res.status !== 200) {
+                                    help(
+                                        'An unexpected error occurred while registering you for push notifications. Please try again later.'
+                                    );
+                                    return;
+                                } else {
+                                    res.json().then(json => {
+                                        navigator.serviceWorker.getRegistration().then(reg => {
+                                            if (reg) {
+                                                reg.pushManager.subscribe({
+                                                    userVisibleOnly: true,
+                                                    applicationServerKey: json
+                                                        .applicationServerKey
+                                                }).then(subscription => {
+                                                    fetch('/api/user/subscribe/', {
+                                                        method: 'POST',
+                                                        credentials: "include",
+                                                        headers: {
+                                                            'content-type': 'application/json'
+                                                        },
+                                                        body: JSON
+                                                            .stringify(
+                                                                subscription
+                                                            )
+                                                    }).then(resp => {
+                                                        help(
+                                                            'You\'ve been successfully subscribed!'
+                                                        );
+                                                    });
+                                                });
+                                            }
+                                        });
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+
                 function regen(e) {
                     if (e.key !== 'Enter' && e.type !== 'click') return;
                     fetch('/api/user/regentoken/', {
@@ -154,13 +201,15 @@
                                         'Your Token has been refreshed! To get it, click me!';
                                     iDesc.appendChild(iDescText);
                                     iBox.addEventListener('click', () => {
-                                        setTimeout(() =>{
+                                        setTimeout(() => {
                                             iBox.remove();
-                                            help('Your new token has been put on your clipboard, the page will now refresh.');
+                                            help(
+                                                'Your new token has been put on your clipboard, the page will now refresh.'
+                                            );
                                             setTimeout(() => {
                                                 window.location.reload();
                                             }, 7000);
-                                        },50);
+                                        }, 50);
                                     }, false);
                                     iBox.setAttribute('data-clipboard-text', token.token)
                                     document.getElementById('projects').appendChild(iBox);
@@ -191,7 +240,9 @@
                     }).then(res => {
                         switch (res.status) {
                             case 200:
-                                help('Your account has been deleted, you\'ll be redirected to the home page soon.')
+                                help(
+                                    'Your account has been deleted, you\'ll be redirected to the home page soon.'
+                                )
                                 setTimeout(() => window.location.href = '/', 7000);
                                 break;
                             case 401:
@@ -225,7 +276,9 @@
                         switch (res.status) {
                             case 200:
                                 res.json().then(domain => {
-                                    help(`Your new domain is ${domain.subdomain ? `${domain.subdomain}.` : ''}${domain.domain}!`);
+                                    help(
+                                        `Your new domain is ${domain.subdomain ? `${domain.subdomain}.` : ''}${domain.domain}!`
+                                    );
                                     document.getElementById('domain').value = domain.domain;
                                     document.getElementById('subdomain').value = domain.subdomain;
                                 });
@@ -299,7 +352,8 @@
                 <div class="project_title">Domain and Subdomain</div>
                 <div class="project_description">
                     <p>Choose your favorite domain and subdomain options!</p>
-                    <input type="text" id="subdomain" placeholder="Subdomain" class="darktextbox" autocomplete="off"></input><select id="domain"></select>
+                    <input type="text" id="subdomain" placeholder="Subdomain" class="darktextbox"
+                        autocomplete="off"></input><select id="domain"></select>
                     <br>
                     <button id="domain_sel" class="button">I want that one</button>
                     <p id="domain_err" class="error_text"></p>
@@ -328,6 +382,27 @@
                     <p id="del_err" class="error_text"></p>
                 </div>
             </div>
+            <!-- <div class="project float auth">
+                <div class="project_title">Notifications <sup style="color:red;cursor:help;"
+                        title="This feature is not fully completed! Expect bugs!">[BETA]</sup></div>
+                <div class="project_description">
+                    <label class="container">
+                        <input type="checkbox" id="enablenotif">
+                        <span class="checkmark"></span>
+                        <p class="checkbox_align">__ </p>Enable notifications
+                    </label>
+                    <label class="container">
+                        <input type="checkbox" disabled id="uploadnotif">
+                        <span class="checkmark"></span>
+                        <p class="checkbox_align">__ </p>Get alerted for new uploads
+                    </label>
+                    <label class="container">
+                        <input type="checkbox" disabled id="loginnotif">
+                        <span class="checkmark"></span>
+                        <p class="checkbox_align">__ </p>Get alerted for new logins
+                    </label>
+                </div>
+            </div> -->
         </div>
         <div class="footer_box">
             <a href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>

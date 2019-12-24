@@ -4,7 +4,6 @@ var urlsToCache = [
     'https://fonts.googleapis.com/css?family=K2D',
     'https://fonts.gstatic.com/s/k2d/v3/J7aTnpF2V0EjZKUsrLc.woff2',
     'https://fonts.gstatic.com/s/k2d/v3/J7aTnpF2V0EjcKUs.woff2',
-    '/',
     '/me/',
     '/me/upload/',
     '/me/uploads/',
@@ -68,3 +67,7 @@ self.addEventListener('fetch', function (event) {
             })
     );
 });
+
+self.addEventListener('push', event => {
+    
+})

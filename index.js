@@ -53,9 +53,7 @@ user.init({
     domain: Sequelize.STRING,
     subdomain: Sequelize.STRING,
     bannedAt: Sequelize.DATE,
-    pushSubEndpoint: Sequelize.STRING(2000),
-    pushSubP256DH: Sequelize.STRING(2000),
-    pushSubAuth: Sequelize.STRING(2000)
+    pushSubCredentials: Sequelize.JSON
 }, {
     sequelize
 });
@@ -977,7 +975,9 @@ app.post('/api/user/subscribe/', (req, res) => {
                 id: req.session.user.id
             }
         }).then(u => {
-            u.update({pushSubEndpoint: req.body.endpoint, pushSubP256DH: req.body.keys.p256dh, pushSubAuth: req.body.keys.auth}).then
+            u.update({pushSubCredentials: [...u.pushSubCredentials, req.body]}).then(() => {
+                res.sendStatus(200);
+            })
         })
     }).catch(() => {
         res.sendStatus(401);
@@ -990,8 +990,7 @@ app.get('/api/user/testsubscription/', (req, res) => {
                 id: req.session.user.id
             }
         }).then(u => {
-            res.sendStatus(200);
-            webpush.sendNotification({endpoint: u.pushSubEndpoint, keys: {p256dh: u.pushSubP256DH, auth: u.pushSubAuth}}, 'gay')
+            webpush.sendNotification(u.pushSubCredentials, 'gay')
         })
     })
 });
