@@ -102,7 +102,7 @@
                                     iDescText.innerText =
                                         'It uploaded! To get the link, click me!';
                                     iDesc.appendChild(iDescText);
-                                    iBox.addEventListener('click', help('Upload link copied to clipboard.'), false);
+                                    iBox.addEventListener('click', () => {help('Upload link copied to clipboard.')}, false);
                                     iBox.setAttribute('data-clipboard-text', text)
                                     document.getElementById('projects').appendChild(iBox);
                                 });
