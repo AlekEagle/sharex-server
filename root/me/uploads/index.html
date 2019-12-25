@@ -95,6 +95,12 @@
                         document.location.href =
                             `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
                     }
+                }).catch(err => {
+                    help('It appears you are offline. Please try again later.');
+                    document.getElementById('load_more').hidden = false;
+                    document.getElementById('loadmore').style.margin = size;
+                    document.getElementById('loading_ani').style.display =
+                        'none';
                 });
             }
 
@@ -159,7 +165,11 @@
                         });
                     }
                 }).catch(err => {
-                    help('It appears you are offline. Please try again later.')
+                    help('It appears you are offline. Please try again later.');
+                    document.getElementById('load_more').hidden = false;
+                    document.getElementById('loadmore').style.margin = size;
+                    document.getElementById('loading_ani').style.display =
+                        'none';
                 });
             }
             document.addEventListener('readystatechange', e => {

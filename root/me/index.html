@@ -76,7 +76,8 @@
                         });
                     }
                 }).catch(err => {
-                    help('It appears you are offline. Please try again later.')
+                    help('It appears you are offline. Please try again later.');
+                    document.getElementById('subtitle').innerText = 'You\'re offline :('
                 });
 
             }
@@ -102,7 +103,7 @@
             </div>
         </header>
         <div class="under_header"></div>
-        <p id="subtitle" class="subtitle"></p>
+        <p id="subtitle" class="subtitle">Checking who you are..</p>
         </p>
         <div class="projects">
 

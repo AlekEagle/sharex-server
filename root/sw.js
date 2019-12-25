@@ -1,4 +1,5 @@
-var CACHE_NAME = 'alekeagle-me-v1';
+var CACHE_NAME = 'v1';
+var expectedCaches = [CACHE_NAME];
 var urlsToCache = [
     'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js',
     'https://fonts.googleapis.com/css?family=K2D',
@@ -17,20 +18,38 @@ var urlsToCache = [
 ];
 
 self.addEventListener('install', function (event) {
-    // Perform install steps
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            if (cacheNames.includes(CACHE_NAME)) {
-                caches.delete(CACHE_NAME).then(() => {
-                    caches.open(CACHE_NAME).then(function (cache) {
-                        console.log('Opened cache');
-                        return cache.addAll(urlsToCache.map(url => {
-                            return new Request(url);
-                        }));
-                    });
+    self.skipWaiting();
+    caches.keys().then(cacheNames => {
+        console.log('Getting caches..');
+        cacheNames.map(cacheName => {
+            if (!expectedCaches.includes(cacheName)) {
+                console.log(`Checking for ${cacheName}..`);
+                caches.delete(cacheName).then(() => {
+                    console.log(`Deleting cache ${cacheName}`);
                 })
             }
         })
+    })
+    event.waitUntil(
+        caches.open(CACHE_NAME).then(function (cache) {
+            console.log(`Adding all urls to cache ${CACHE_NAME}`);
+            return cache.addAll(urlsToCache.map(url => {
+                console.log(`Adding ${url} to ${CACHE_NAME}`);
+                return new Request(url);
+            }));
+        })
+    );
+});
+
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys().then(keys => Promise.all(
+            keys.map(key => {
+                if (!expectedCaches.includes(key)) {
+                    return caches.delete(key);
+                }
+            })
+        ))
     );
 });
 
@@ -69,5 +88,5 @@ self.addEventListener('fetch', function (event) {
 });
 
 self.addEventListener('push', event => {
-    
+
 })
