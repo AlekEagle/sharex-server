@@ -20,6 +20,7 @@
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-3"></script>
         <script defer src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js"></script>
         <script src="/assets/js/snackbar.js"></script>
+        <script src="/assets/js/reloadOnOnline.js"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
 
@@ -206,7 +207,7 @@
                         document.getElementById('send').addEventListener('click', uploadFile, false);
                     }
                 }).catch(err => {
-                    help('It appears you are offline. Please try again later.')
+                    
                 });
             }
             document.addEventListener('readystatechange', e => {

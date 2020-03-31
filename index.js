@@ -199,7 +199,7 @@ app.use((req, res, next) => {
     console.log(`${req.ip}: ${req.method} => ${req.protocol}://${req.headers.host}${req.url}`);
     next();
 }, express.static('uploads'), (req, res, next) => {
-    if (req.headers.host !== 'alekeagle.me' && !req.headers.host.includes('localhost') && !req.headers.host.includes('192.168.')) {
+    if (req.headers.host !== 'alekeagle.me' && !req.headers.host.includes('localhost') && !req.headers.host.includes('192.168.') && !req.headers.host.includes('127.0.0.1')) {
         res.redirect(301, 'https://alekeagle.me' + req.path);
         return;
     } else {

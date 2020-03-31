@@ -14,7 +14,8 @@ var urlsToCache = [
     '/assets/images/circle.png',
     '/assets/images/me_irl.png',
     '/assets/images/empty.gif',
-    '/assets/js/snackbar.js'
+    '/assets/js/snackbar.js',
+    '/assets/js/reloadOnOnline.js'
 ];
 
 self.addEventListener('install', function (event) {

@@ -19,6 +19,7 @@
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-3"></script>
         <script src="/assets/js/snackbar.js"></script>
+        <script src="/assets/js/reloadOnOnline.js"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
 
@@ -40,7 +41,8 @@
                 window.addEventListener('load', function () {
                     navigator.serviceWorker.register('/sw.js').then(function (registration) {
                         // Registration was successful
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                        console.log('ServiceWorker registration successful with scope: ', registration
+                            .scope);
                     }, function (err) {
                         // registration failed :(
                         console.log('ServiceWorker registration failed: ', err);
