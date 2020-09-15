@@ -35,10 +35,16 @@ const fs = require('fs'),
     port = process.argv[2] || 3000;
 
 dotenv.config();
-const sequelize = new Sequelize(`postgres://${process.env.SERVERUSERNAME}:${process.env.SERVERPASSWORD}@${process.env.SERVERIP}:5432/${process.env.SERVERDB}`, {
+const sequelize = new Sequelize({
+    database: process.env.SERVERDB,
+    username: process.env.SERVERUSERNAME,
+    password: process.env.SERVERPASSWORD,
+    host: process.env.SERVERIP,
+    port: 5432,
+    dialect: 'postgres',
     logging: false
 });
-class user extends Sequelize.Model {};
+class user extends Sequelize.Model { };
 user.init({
     id: {
         type: Sequelize.STRING,
@@ -64,7 +70,7 @@ user.sync({
 }).catch(err => {
     console.error('an error occurred while performing this operation', err);
 });
-class uploads extends Sequelize.Model {};
+class uploads extends Sequelize.Model { };
 uploads.init({
     filename: {
         type: Sequelize.STRING,
@@ -82,7 +88,7 @@ uploads.sync({
 }).catch(err => {
     console.error('an error occurred while performing this operation', err);
 });
-class actions extends Sequelize.Model {};
+class actions extends Sequelize.Model { };
 actions.init({
     type: Sequelize.INTEGER,
     by: Sequelize.STRING,
@@ -98,7 +104,7 @@ actions.sync({
 }).catch(err => {
     console.error('an error occurred while performing this operation', err);
 });
-class domains extends Sequelize.Model {};
+class domains extends Sequelize.Model { };
 domains.init({
     domain: {
         type: Sequelize.STRING,
@@ -198,8 +204,8 @@ app.use((req, res, next) => {
     }
     console.log(`${req.ip}: ${req.method} => ${req.protocol}://${req.headers.host}${req.url}`);
     next();
-}, express.static('uploads'), (req, res, next) => {
-    if (req.headers.host !== 'alekeagle.me' && !req.headers.host.includes('localhost') && !req.headers.host.includes('192.168.') && !req.headers.host.includes('127.0.0.1')) {
+}, express.static('uploads', { acceptRanges: false }), (req, res, next) => {
+    if (req.headers.host !== 'alekeagle.me' && !req.headers.host.includes('localhost') && !req.headers.host.includes('192.168.') && !req.headers.host.includes('127.0.0.1') && !req.headers.host.includes('::1')) {
         res.redirect(301, 'https://alekeagle.me' + req.path);
         return;
     } else {
@@ -292,11 +298,11 @@ app.post('/api/user/create/', (req, res) => {
         user.findOne({
             where: {
                 [Op.or]: [{
-                        username
-                    },
-                    {
-                        email
-                    }
+                    username
+                },
+                {
+                    email
+                }
                 ]
             }
         }).then(u => {
@@ -413,11 +419,11 @@ app.put('/api/user/update/', (req, res) => {
                     user.findOne({
                         where: {
                             [Op.or]: [{
-                                    username: req.session.user.username
-                                },
-                                {
-                                    email: req.session.user.username
-                                }
+                                username: req.session.user.username
+                            },
+                            {
+                                email: req.session.user.username
+                            }
                             ]
                         }
                     }).then(u => {
@@ -508,11 +514,11 @@ app.delete('/api/user/delete/', (req, res) => {
                 user.findOne({
                     where: {
                         [Op.or]: [{
-                                username: req.session.user.username
-                            },
-                            {
-                                email: req.session.user.username
-                            }
+                            username: req.session.user.username
+                        },
+                        {
+                            email: req.session.user.username
+                        }
                         ]
                     }
                 }).then(u => {
@@ -579,11 +585,11 @@ app.post('/api/user/login/', (req, res) => {
         user.findOne({
             where: {
                 [Op.or]: [{
-                        username: name
-                    },
-                    {
-                        email: name
-                    }
+                    username: name
+                },
+                {
+                    email: name
+                }
                 ]
             }
         }).then(u => {
@@ -654,11 +660,11 @@ app.post('/api/user/regentoken/', (req, res) => {
             user.findOne({
                 where: {
                     [Op.or]: [{
-                            username: req.session.user.username
-                        },
-                        {
-                            email: req.session.user.username
-                        }
+                        username: req.session.user.username
+                    },
+                    {
+                        email: req.session.user.username
+                    }
                     ]
                 }
             }).then(u => {
@@ -975,7 +981,7 @@ app.post('/api/user/subscribe/', (req, res) => {
                 id: req.session.user.id
             }
         }).then(u => {
-            u.update({pushSubCredentials: [...u.pushSubCredentials, req.body]}).then(() => {
+            u.update({ pushSubCredentials: [...u.pushSubCredentials, req.body] }).then(() => {
                 res.sendStatus(200);
             })
         })
@@ -1022,17 +1028,19 @@ app.post('/upload/', upload.single('file'), (req, res) => {
                         size: req.body.file.length
                     });
                 } else {
-                    let ft = fileType(req.file.buffer.slice(0, fileType.minimumBytes));
-                    let filename = newString(10),
-                        writeStream = fs.createWriteStream(`${__dirname}/uploads/${filename}.${ft ? ft.ext : map[req.file.mimetype]}`);
-                    writeStream.write(req.file.buffer);
-                    writeStream.end();
-                    writeStream.destroy();
-                    res.status(201).end(`https://${u.subdomain ? `${u.subdomain}.` : ''}${u.domain}/${filename}.${ft ? ft.ext : map[req.file.mimetype]}`);
-                    uploads.create({
-                        filename: `${filename}.${ft ? ft.ext : map[req.file.mimetype]}`,
-                        userid: u.id,
-                        size: req.file.size
+                    fileType.fromBuffer(req.file.buffer.slice(0, fileType.minimumBytes)).then(ft => {
+                        let filename = newString(10),
+                            writeStream = fs.createWriteStream(`${__dirname}/uploads/${filename}.${ft ? ft.ext : map[req.file.mimetype]}`);
+                        res.status(201).end(`https://${u.subdomain ? `${u.subdomain}.` : ''}${u.domain}/${filename}.${ft ? ft.ext : map[req.file.mimetype]}`);
+                        uploads.create({
+                            filename: `${filename}.${ft ? ft.ext : map[req.file.mimetype]}`,
+                            userid: u.id,
+                            size: req.file.size
+                        }).then(() => {
+                            writeStream.write(req.file.buffer);
+                            writeStream.end();
+                            writeStream.destroy();
+                        })
                     });
                 }
             } else {
@@ -1042,7 +1050,7 @@ app.post('/upload/', upload.single('file'), (req, res) => {
         });
     }
 });
-app.use(express.static('root'), (req, res, next) => {
+app.use(express.static('root', { acceptRanges: false }), (req, res, next) => {
     res.status(404).sendFile(`${__dirname}/views/err404.html`);
 });
 

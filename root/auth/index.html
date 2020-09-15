@@ -1,208 +1,305 @@
 <!DOCTYPE html>
 <html lang="en-US">
-
-    <head>
-        <title>AlekEagle ShareX Login</title>
-        <meta name="theme-color" content="#3a3a3a">
-        <link rel="shortcut icon" href="https://alekeagle.me/favicon.ico" type="image/x-icon" />
-        <meta property="og:title" content="AlekEagle ShareX Login">
-        <meta property="og:description" content="AlekEagle ShareX Login" />
-        <meta property="og:image" content="https://alekeagle.me/assets/images/me_irl.png">
-        <meta name="viewport" content="width=0.7,initial-scale=0.7">
-        <link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet" type="text/css">
-        <link href="/assets/css/universal.css" rel="stylesheet" type="text/css">
-        <link rel="manifest" href="/manifest.json">
-        <!-- 
+  <head>
+    <title>AlekEagle ShareX Login</title>
+    <meta name="theme-color" content="#3a3a3a" />
+    <link
+      rel="shortcut icon"
+      href="https://alekeagle.me/favicon.ico"
+      type="image/x-icon"
+    />
+    <meta property="og:title" content="AlekEagle ShareX Login" />
+    <meta property="og:description" content="AlekEagle ShareX Login" />
+    <meta
+      property="og:image"
+      content="https://alekeagle.me/assets/images/me_irl.png"
+    />
+    <meta name="viewport" content="width=0.7,initial-scale=0.7" />
+    <link
+      href="https://fonts.googleapis.com/css?family=K2D"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link href="/assets/css/universal.css" rel="stylesheet" type="text/css" />
+    <link rel="manifest" href="/manifest.json" />
+    <!-- 
         <canvas id="bgCanvas"></canvas>
         <script type="text/javascript" src="assets/js/classical-noise.js"></script>
         <script type="text/javascript" src="assets/js/bgAnimation.js"></script> -->
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-3"></script>
-        <script src="/assets/js/snackbar.js"></script>
-        <script src="/assets/js/reloadOnOnline.js"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-3"
+    ></script>
+    <script src="/assets/js/snackbar.js"></script>
+    <script src="/assets/js/reloadOnOnline.js"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
 
-            function gtag() {
-                dataLayer.push(arguments);
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "UA-135044771-3");
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").then(
+            function (registration) {
+              // Registration was successful
+              console.log(
+                "ServiceWorker registration successful with scope: ",
+                registration.scope
+              );
+            },
+            function (err) {
+              // registration failed :(
+              console.log("ServiceWorker registration failed: ", err);
             }
-            gtag('js', new Date());
+          );
+        });
+      }
+      function createPopup(url, menu) {
+        popupWindow = window.open(
+          url,
+          "popUpWindow",
+          `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
+        );
+      }
 
-            gtag('config', 'UA-135044771-3');
-        </script>
-        <script>
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function () {
-                    navigator.serviceWorker.register('/sw.js').then(function (registration) {
-                        // Registration was successful
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    }, function (err) {
-                        // registration failed :(
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-                });
+      function init() {
+        fetch("/api/authenticate/", {
+          credentials: "include",
+        })
+          .then((res) => {
+            if (res.status === 200) {
+              document.location.href = `${document.location.protocol}//${
+                document.location.host
+              }${queryObj.redirect || "/"}`;
+              return;
             }
-            function createPopup(url, menu) {
-                popupWindow = window.open(url, 'popUpWindow',
-                    `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
-                )
+          })
+          .catch((err) => {});
+        let queryObj = JSON.parse(
+          `{${document.location.search
+            .replace(/\?/, "")
+            .split("&")
+            .map((q) => `"${q.split("=")[0]}": "${q.split("=")[1]}"`)
+            .join(", ")}}`
+        );
+
+        function login(e) {
+          if (e.key !== "Enter" && e.type !== "click") return;
+          fetch("/api/user/login/", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: document.getElementById("username_login").value,
+              password: document.getElementById("password_login").value,
+            }),
+          }).then((res) => {
+            switch (res.status) {
+              case 200:
+                document.location.href = `${document.location.protocol}//${
+                  document.location.host
+                }${queryObj.redirect || "/"}`;
+                break;
+              case 401:
+                document.getElementById("login_err").innerText =
+                  "Incorrect username or password";
+                break;
+              case 500:
+                document.getElementById("login_err").innerText =
+                  "An unknown error occurred, try again later";
+                break;
+              case 400:
+                document.getElementById("login_err").innerText =
+                  "All fields are required";
+                break;
+              default:
+                console.log(res.status);
+                break;
             }
+          });
+        }
 
-            function init() {
-                fetch('/api/authenticate/', {
-                    credentials: 'include'
-                }).then(res => {
-                    if (res.status === 200) {
-                        document.location.href =
-                            `${document.location.protocol}//${document.location.host}${queryObj.redirect || '/'}`;
-                        return;
-                    }
-                }).catch(err => {
-                    
-                });
-                let queryObj = JSON.parse(
-                    `{${document.location.search.replace(/\?/, '').split('&').map(q => `"${q.split('=')[0]}": "${q.split('=')[1]}"`).join(', ')}}`
-                );
-
-                function login(e) {
-                    if (e.key !== 'Enter' && e.type !== 'click') return;
-                    fetch('/api/user/login/', {
-                        method: 'POST',
-                        credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            name: document.getElementById('username_login').value,
-                            password: document.getElementById('password_login').value
-                        })
-                    }).then(res => {
-                        switch (res.status) {
-                            case 200:
-                                document.location.href =
-                                    `${document.location.protocol}//${document.location.host}${queryObj.redirect || '/'}`;
-                                break;
-                            case 401:
-                                document.getElementById('login_err').innerText =
-                                    'Incorrect username or password';
-                                break;
-                            case 500:
-                                document.getElementById('login_err').innerText =
-                                    'An unknown error occurred, try again later';
-                                break;
-                            case 400:
-                                document.getElementById('login_err').innerText = 'All fields are required';
-                                break;
-                            default:
-                                console.log(res.status);
-                                break;
-                        }
-                    });
-                }
-
-                function register(e) {
-                    if (e.key !== 'Enter' && e.type !== 'click') return;
-                    if (document.getElementById('password_regis').value !== document.getElementById('repassword_regis')
-                        .value) {
-                        document.getElementById('register_err').innerText =
-                            'These passwords do not match';
-                        return;
-                    }
-                    fetch('/api/user/create/', {
-                        method: 'POST',
-                        credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            name: document.getElementById('username_regis').value,
-                            email: document.getElementById('email_regis').value,
-                            password: document.getElementById('password_regis').value
-                        })
-                    }).then(res => {
-                        switch (res.status) {
-                            case 201:
-                                document.location.href =
-                                    `${document.location.protocol}//${document.location.host}${queryObj.redirect || '/'}`;
-                                break;
-                            case 401:
-                                document.getElementById('register_err').innerText =
-                                    'A user with those credentials already exists';
-                                break;
-                            case 500:
-                                document.getElementById('register_err').innerText =
-                                    'An unknown error occurred, try again later';
-                            case 400:
-                                document.getElementById('register_err').innerText = 'All fields are required';
-                                break;
-                            default:
-                                console.log(res.status);
-                                break;
-                        }
-                    });
-                }
-                document.getElementById('login').addEventListener('click', login, false);
-                document.getElementById('password_login').addEventListener('keydown', login, false);
-                document.getElementById('username_login').addEventListener('keydown', login, false);
-                document.getElementById('register').addEventListener('click', register, false);
-                document.getElementById('username_regis').addEventListener('keydown', register, false);
-                document.getElementById('email_regis').addEventListener('keydown', register, false);
-                document.getElementById('password_regis').addEventListener('keydown', register, false);
-                document.getElementById('repassword_regis').addEventListener('keydown', register, false);
+        function register(e) {
+          if (e.key !== "Enter" && e.type !== "click") return;
+          if (
+            document.getElementById("password_regis").value !==
+            document.getElementById("repassword_regis").value
+          ) {
+            document.getElementById("register_err").innerText =
+              "These passwords do not match";
+            return;
+          }
+          fetch("/api/user/create/", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: document.getElementById("username_regis").value,
+              email: document.getElementById("email_regis").value,
+              password: document.getElementById("password_regis").value,
+            }),
+          }).then((res) => {
+            switch (res.status) {
+              case 201:
+                document.location.href = `${document.location.protocol}//${
+                  document.location.host
+                }${queryObj.redirect || "/"}`;
+                break;
+              case 401:
+                document.getElementById("register_err").innerText =
+                  "A user with those credentials already exists";
+                break;
+              case 500:
+                document.getElementById("register_err").innerText =
+                  "An unknown error occurred, try again later";
+              case 400:
+                document.getElementById("register_err").innerText =
+                  "All fields are required";
+                break;
+              default:
+                console.log(res.status);
+                break;
             }
-            document.addEventListener('readystatechange', e => {
-                if (document.readyState === 'interactive') {
-                    init();
-                }
-            })
-        </script>
-    </head>
+          });
+        }
+        document
+          .getElementById("login")
+          .addEventListener("click", login, false);
+        document
+          .getElementById("password_login")
+          .addEventListener("keydown", login, false);
+        document
+          .getElementById("username_login")
+          .addEventListener("keydown", login, false);
+        document
+          .getElementById("register")
+          .addEventListener("click", register, false);
+        document
+          .getElementById("username_regis")
+          .addEventListener("keydown", register, false);
+        document
+          .getElementById("email_regis")
+          .addEventListener("keydown", register, false);
+        document
+          .getElementById("password_regis")
+          .addEventListener("keydown", register, false);
+        document
+          .getElementById("repassword_regis")
+          .addEventListener("keydown", register, false);
+      }
+      document.addEventListener("readystatechange", (e) => {
+        if (document.readyState === "interactive") {
+          init();
+        }
+      });
+    </script>
+  </head>
 
-    <body>
-        <header class="header">
-            <div class="header__inner">
-                <a href="/">
-                    <img class="header__logo" src="/assets/images/me_irl.png" style="border-radius: 50%;height: 90px;"
-                        alt="AlekEagle">
-                    <h1 class="header__title">
-                        AlekEagle ShareX Server
-                    </h1>
-                </a>
-            </div>
-        </header>
-        <div class="under_header"></div>
-        <p class="subtitle">Login Or Register</p>
-        <div class="projects">
-            <div class="project float auth">
-                <div class="project_title">Login</div>
-                <div class="project_description">
-                    <input type="text" autocomplete="username" name="username" id="username_login" placeholder="Username" maxlength="30" class="darktextbox">
-                    <input type="password" autocomplete="current-password" name="password" id="password_login" maxlength="30" placeholder="Password"
-                        class="darktextbox">
-                    <br>
-                    <button id="login" class="button">Login</button>
-                    <p id="login_err" class="error_text"></p>
-                </div>
-            </div>
-            <div class="project float auth">
-                <div class="project_title">Register</div>
-                <div class="project_description">
-                    <input type="text" autocomplete="username" name="username" id="username_regis" placeholder="Username" maxlength="30" class="darktextbox">
-                    <input type="email" autocomplete="email" name="email" id="email_regis" placeholder="Email" class="darktextbox">
-                    <input type="password" autocomplete="new-password" name="password" id="password_regis" maxlength="30" placeholder="Password"
-                        class="darktextbox">
-                    <input type="password" autocomplete="new-password" name="password2" id="repassword_regis" maxlength="30" placeholder="Re-enter Password"
-                        class="darktextbox">
-                    <br>
-                    <button id="register" class="button">Register</button>
-                    <p id="register_err" class="error_text"></p>
-                </div>
-            </div>
+  <body>
+    <header class="header">
+      <div class="header__inner">
+        <a href="/">
+          <img
+            class="header__logo"
+            src="/assets/images/me_irl.png"
+            style="border-radius: 50%; height: 90px;"
+            alt="AlekEagle"
+          />
+          <h1 class="header__title">
+            AlekEagle ShareX Server
+          </h1>
+        </a>
+      </div>
+    </header>
+    <div class="under_header"></div>
+    <p class="subtitle">Login Or Register</p>
+    <div class="projects">
+      <div class="project float auth">
+        <div class="project_title">Login</div>
+        <div class="project_description">
+          <input
+            type="text"
+            autocomplete="username"
+            name="username"
+            id="username_login"
+            placeholder="Username"
+            maxlength="30"
+            class="darktextbox"
+          />
+          <input
+            type="password"
+            autocomplete="current-password"
+            name="password"
+            id="password_login"
+            maxlength="30"
+            placeholder="Password"
+            class="darktextbox"
+          />
+          <br />
+          <button id="login" class="button">Login</button>
+          <p id="login_err" class="error_text"></p>
         </div>
-        <div class="footer_box">
-            <a href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>
+      </div>
+      <div class="project float auth">
+        <div class="project_title">Register</div>
+        <div class="project_description">
+          <input
+            type="text"
+            autocomplete="username"
+            name="username"
+            id="username_regis"
+            placeholder="Username"
+            maxlength="30"
+            class="darktextbox"
+          />
+          <input
+            type="email"
+            autocomplete="email"
+            name="email"
+            id="email_regis"
+            placeholder="Email"
+            class="darktextbox"
+          />
+          <input
+            type="password"
+            autocomplete="new-password"
+            name="password"
+            id="password_regis"
+            maxlength="30"
+            placeholder="Password"
+            class="darktextbox"
+          />
+          <input
+            type="password"
+            autocomplete="new-password"
+            name="password2"
+            id="repassword_regis"
+            maxlength="30"
+            placeholder="Re-enter Password"
+            class="darktextbox"
+          />
+          <br />
+          <button id="register" class="button">Register</button>
+          <p id="register_err" class="error_text"></p>
         </div>
-        <div id="snackbar"></div>
-    </body>
-
+      </div>
+    </div>
+    <div class="footer_box">
+      <a href="https://alekeagle.com" class="footer_text"
+        >© 2019-2020 AlekEagle</a
+      >
+    </div>
+    <div id="snackbar"></div>
+  </body>
 </html>

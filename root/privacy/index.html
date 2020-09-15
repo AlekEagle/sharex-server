@@ -1,86 +1,115 @@
 <!DOCTYPE html>
 <html lang="en-US">
-
-    <head>
-        <title>AlekEagle ShareX Server</title>
-        <meta name="theme-color" content="#3a3a3a">
-        <link rel="shortcut icon" href="https://alekeagle.me/favicon.ico" type="image/x-icon" />
-        <meta property="og:title" content="AlekEagle ShareX Server">
-        <meta property="og:description" content="AlekEagle ShareX Server" />
-        <meta property="og:image" content="https://alekeagle.me/assets/images/me_irl.png">
-        <meta name="viewport" content="width=0.7,initial-scale=0.7">
-        <link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet" type="text/css">
-        <link href="/assets/css/universal.css" rel="stylesheet" type="text/css">
-        <link rel="manifest" href="/manifest.json">
-        <!-- 
+  <head>
+    <title>AlekEagle ShareX Server</title>
+    <meta name="theme-color" content="#3a3a3a" />
+    <link
+      rel="shortcut icon"
+      href="https://alekeagle.me/favicon.ico"
+      type="image/x-icon"
+    />
+    <meta property="og:title" content="AlekEagle ShareX Server" />
+    <meta property="og:description" content="AlekEagle ShareX Server" />
+    <meta
+      property="og:image"
+      content="https://alekeagle.me/assets/images/me_irl.png"
+    />
+    <meta name="viewport" content="width=0.7,initial-scale=0.7" />
+    <link
+      href="https://fonts.googleapis.com/css?family=K2D"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link href="/assets/css/universal.css" rel="stylesheet" type="text/css" />
+    <link rel="manifest" href="/manifest.json" />
+    <!-- 
         <canvas id="bgCanvas"></canvas>
         <script type="text/javascript" src="assets/js/classical-noise.js"></script>
         <script type="text/javascript" src="assets/js/bgAnimation.js"></script> -->
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-3"></script>
-        <script src="/assets/js/snackbar.js"></script>
-        <script src="/assets/js/reloadOnOnline.js"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-3"
+    ></script>
+    <script src="/assets/js/snackbar.js"></script>
+    <script src="/assets/js/reloadOnOnline.js"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
 
-            function gtag() {
-                dataLayer.push(arguments);
-            }
-            gtag('js', new Date());
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-            gtag('config', 'UA-135044771-3');
-        </script>
-        <script>
-            function createPopup(url, menu) {
-                popupWindow = window.open(url, 'popUpWindow',
-                    `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
-                )
-            }
-        </script>
-    </head>
+      gtag("config", "UA-135044771-3");
+    </script>
+    <script>
+      function createPopup(url, menu) {
+        popupWindow = window.open(
+          url,
+          "popUpWindow",
+          `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
+        );
+      }
+    </script>
+  </head>
 
-    <body>
-        <header class="header">
-            <div class="header__inner">
-                <a href="/">
-                    <img class="header__logo" src="/assets/images/me_irl.png" style="border-radius: 50%;height: 90px;"
-                        alt="AlekEagle">
-                    <h1 class="header__title">
-                        Privacy Policy
-                    </h1>
-                </a>
-                <br><a href="/"><button class="button header_button">Back</button></a>
-            </div>
-        </header>
-        <div class="under_header"></div>
-        <p class="subtitle">Your privacy matters to me just as much to you.</p>
-        <div class="projects">
-            <div class="project float auth">
-                <div class="project_title">What's Collected</div>
-                <div class="project_description">-Email<br>-Any and all files uploaded to the server</div>
-            </div>
-            <div class="project float auth">
-                <div class="project_title">Why it's Collected</div>
-                <div class="project_description">-Email: if you need to be contacted for any reason, an email on file is
-                    easy to have.<br>-Files: This is a file server after all, it wouldn't make sense to delete every
-                    file uploaded as soon as its uploaded.</div>
-            </div>
-            <div class="project float auth">
-                <div class="project_title">How it's Collected</div>
-                <div class="project_description">When you register your Email is given to us.<br>Every time you upload a
-                    file to the server, it is saved.</div>
-            </div>
-            <a href="mailto:contact@alekeagle.com">
-                <div class="project float auth">
-                    <div class="project_title">Contact me</div>
-                    <div class="project_description">If you have any questions feel free to email me.</div>
-                </div>
-            </a>
+  <body>
+    <header class="header">
+      <div class="header__inner">
+        <a href="/">
+          <img
+            class="header__logo"
+            src="/assets/images/me_irl.png"
+            style="border-radius: 50%; height: 90px;"
+            alt="AlekEagle"
+          />
+          <h1 class="header__title">
+            Privacy Policy
+          </h1>
+        </a>
+        <br /><a href="/"><button class="button header_button">Back</button></a>
+      </div>
+    </header>
+    <div class="under_header"></div>
+    <p class="subtitle">Your privacy matters to me just as much to you.</p>
+    <div class="projects">
+      <div class="project float auth">
+        <div class="project_title">What's Collected</div>
+        <div class="project_description">
+          -Email<br />-Any and all files uploaded to the server
         </div>
-        <div class="footer_box">
-            <a href="https://alekeagle.com" class="footer_text">© 2019 AlekEagle</a>
+      </div>
+      <div class="project float auth">
+        <div class="project_title">Why it's Collected</div>
+        <div class="project_description">
+          -Email: if you need to be contacted for any reason, an email on file
+          is easy to have.<br />-Files: This is a file server after all, it
+          wouldn't make sense to delete every file uploaded as soon as its
+          uploaded.
         </div>
-        <div id="snackbar"></div>
-    </body>
-
+      </div>
+      <div class="project float auth">
+        <div class="project_title">How it's Collected</div>
+        <div class="project_description">
+          When you register your Email is given to us.<br />Every time you
+          upload a file to the server, it is saved.
+        </div>
+      </div>
+      <a href="mailto:contact@alekeagle.com">
+        <div class="project float auth">
+          <div class="project_title">Contact me</div>
+          <div class="project_description">
+            If you have any questions feel free to email me.
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="footer_box">
+      <a href="https://alekeagle.com" class="footer_text"
+        >© 2019-2020 AlekEagle</a
+      >
+    </div>
+    <div id="snackbar"></div>
+  </body>
 </html>
