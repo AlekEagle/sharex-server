@@ -1,4 +1,4 @@
-let CACHE_NAME = 'v1';
+let CACHE_NAME = 'vjazz';
 let expectedCaches = [CACHE_NAME];
 let urlsToCache = [
     'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js',
@@ -59,7 +59,7 @@ self.addEventListener('fetch', function (event) {
         event.respondWith((async () => {
             const formData = await event.request.formData();
             const file = formData.get('file');
-            self.parent.postMessage({file, action: 'load-image'})
+            self.parent.postMessage({file, action: 'load-image'}, null, file);
             return Response.redirect('/me/upload/', 303);
         })());
     } else if (event.request.method !== 'POST') {
