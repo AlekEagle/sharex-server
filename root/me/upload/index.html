@@ -152,7 +152,7 @@
                             fileSelector.innerText = 'Your file here';
                         }
                     }
-                });
+                }, false);
                 navigator.serviceWorker.ready.then(registration => {
                     registration.active.postMessage({action: 'receive-share-file'});
                 });
