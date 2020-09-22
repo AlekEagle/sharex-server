@@ -1,4 +1,4 @@
-let CACHE_NAME = 'v21223';
+let CACHE_NAME = 'v23';
 let expectedCaches = [CACHE_NAME];
 let urlsToCache = [
     'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js',
@@ -17,7 +17,7 @@ let urlsToCache = [
     '/assets/js/snackbar.js',
     '/assets/js/reloadOnOnline.js'
 ];
-let file;
+let file = null;
 
 self.addEventListener('install', function (event) {
     self.skipWaiting();
@@ -65,43 +65,46 @@ self.addEventListener('fetch', function (event) {
         })());
     } else if (event.request.method !== 'POST') {
         event.respondWith(
-        caches.match(event.request)
-            .then(function (response) {
-                // Cache hit - return response
-                if (response) {
-                    return response;
-                }
-
-                return fetch(event.request).then(
-                    function (response) {
-                        // Check if we received a valid response
-                        if (!response || response.status !== 200 || response.type === 'opaque' || response.url.includes('/api/')) {
-                            return response;
-                        }
-
-                        // IMPORTANT: Clone the response. A response is a stream
-                        // and because we want the browser to consume the response
-                        // as well as the cache consuming the response, we need
-                        // to clone it so we have two streams.
-                        var responseToCache = response.clone();
-
-                        caches.open(CACHE_NAME)
-                            .then(function (cache) {
-                                cache.put(event.request, responseToCache);
-                            });
-
+            caches.match(event.request)
+                .then(function (response) {
+                    // Cache hit - return response
+                    if (response) {
                         return response;
                     }
-                );
-            })
+
+                    return fetch(event.request).then(
+                        function (response) {
+                            // Check if we received a valid response
+                            if (!response || response.status !== 200 || response.type === 'opaque' || response.url.includes('/api/')) {
+                                return response;
+                            }
+
+                            // IMPORTANT: Clone the response. A response is a stream
+                            // and because we want the browser to consume the response
+                            // as well as the cache consuming the response, we need
+                            // to clone it so we have two streams.
+                            var responseToCache = response.clone();
+
+                            caches.open(CACHE_NAME)
+                                .then(function (cache) {
+                                    cache.put(event.request, responseToCache);
+                                });
+
+                            return response;
+                        }
+                    );
+                })
         );
-    }else {
-        event.respondWith(fetch(event.request).then(res => {return res;}));
+    } else {
+        event.respondWith(fetch(event.request).then(res => { return res; }));
     }
 });
 
 self.addEventListener('message', event => {
-    if(event.data.action === 'receive-share-file') {
-        setTimeout(() => event.source.postMessage({file, action: 'load-image'}), 1000);
+    if (event.data.action === 'receive-share-file' && file !== null) {
+        setTimeout(() => { 
+            event.source.postMessage({ file, action: 'load-image' });
+            file = null;
+        }, 1000);
     }
 });
