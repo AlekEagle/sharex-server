@@ -137,7 +137,7 @@
             function init() {
                 navigator.serviceWorker.addEventListener('message', event => {
                     console.log(event.data);
-                    if(event.data === null) {
+                    if(event.data === null || event.data.file === null) {
                         help("It appears something went wrong when receiving the file, if this issue continues, please contact Alek.");
                         return;
                     }
