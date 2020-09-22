@@ -1,4 +1,4 @@
-let CACHE_NAME = 'v3';
+let CACHE_NAME = 'vsdfasd';
 let expectedCaches = [CACHE_NAME];
 let urlsToCache = [
     'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js',
@@ -104,7 +104,6 @@ self.addEventListener('message', event => {
     if (event.data.action === 'receive-share-file' && file !== null) {
         setTimeout(() => { 
             event.source.postMessage({ file, action: 'load-image' });
-            file = null;
         }, 1000);
     }
 });
