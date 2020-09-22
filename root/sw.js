@@ -12,7 +12,7 @@ var urlsToCache = [
     '/assets/css/universal.css',
     '/assets/js/memory.js',
     '/assets/images/circle.png',
-    '/assets/images/me_irl.png',
+    '/assets/images/me_irl.webp',
     '/assets/images/empty.gif',
     '/assets/js/snackbar.js',
     '/assets/js/reloadOnOnline.js'
@@ -55,7 +55,21 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', function (event) {
-    event.respondWith(
+    if (event.request.method === 'POST' && event.request.url.includes('/me/upload/')) {
+        event.respondWith((async () => {
+            const formData = await event.request.formData();
+            const file = formData.get('file');
+            function recieveReadyMessage(event) {
+                if (event.data.action === 'ready') {
+                    event.source.postMessage({file, action: 'load-image'});
+                    self.removeEventListener('message', recieveReadyMessage);
+                }
+            }
+            self.addEventListener('message', recieveReadyMessage);
+            return Response.redirect('/me/upload/', 303);
+        })());
+    } else if (event.request.method !== 'POST') {
+        event.respondWith(
         caches.match(event.request)
             .then(function (response) {
                 // Cache hit - return response
@@ -85,7 +99,10 @@ self.addEventListener('fetch', function (event) {
                     }
                 );
             })
-    );
+        );
+    }else {
+        event.respondWith(fetch(event.request).then(res => {return res;}));
+    }
 });
 
 self.addEventListener('push', event => {

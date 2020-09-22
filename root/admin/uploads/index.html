@@ -41,6 +41,13 @@
                     });
                 });
             }
+            let queryObj = JSON.parse(
+                `{${document.location.search
+                  .replace(/\?/, "")
+                  .split("&")
+                  .map((q) => `"${q.split("=")[0]}": "${q.split("=")[1]}"`)
+                  .join(", ")}}`
+            );
             let offset = 0,
                 main,
                 size = '12px 0px 30px 0px';
@@ -55,7 +62,7 @@
                 document.getElementById('loadmore').style.margin = '0px';
                 document.getElementById('load_more').hidden = true;
                 document.getElementById('loading_ani').style.display = 'inline-block';
-                fetch(`/api/user/uploads/?offset=${offset}`, {
+                fetch(`/api/user/uploads/?id=${queryObj.id}&offset=${offset}`, {
                     credentials: "include"
                 }).then(res => {
                     if (res.status === 200) {
@@ -111,6 +118,10 @@
                 document.getElementById('load_more').hidden = true;
                 document.getElementById('loading_ani').style.display = 'inline-block';
                 main = document.getElementById('projects');
+                if(queryObj.id === undefined) {
+                    document.location.href =
+                            `${document.location.protocol}//${document.location.host}/admin/users/`;
+                }
                 fetch('/api/authenticate/', {
                     credentials: 'include'
                 }).then(res => {
@@ -119,7 +130,7 @@
                             `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
                         return;
                     } else {
-                        fetch('/api/user/uploads/', {
+                        fetch(`/api/user/uploads/?id=${queryObj.id}`, {
                             credentials: "include"
                         }).then(res => {
                             if (res.status === 200) {

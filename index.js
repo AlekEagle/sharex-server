@@ -1,4 +1,4 @@
-require('./logger');
+require('./logger')('INFO');
 const fs = require('fs'),
     dotenv = require('dotenv'),
     express = require('express'),
@@ -138,12 +138,12 @@ const corsOptions = {
     origin: true,
     optionsSuccessStatus: 200
 }
-let https = require('https'),
+let https = require('http'),
     app = require('express')();
 app.use(cors(corsOptions));
 app.engine('html', require('mustache-express')());
 app.use(express.json());
-let server = https.createServer(options, app);
+let server = https.createServer(/* options, */ app);
 app.use(session({
     cookieName: 'session',
     secret: Math.random().toString(),
@@ -151,7 +151,9 @@ app.use(session({
     activeDuration: ms('1 hour'),
     cookie: {
         httpOnly: true,
-        path: '/'
+        path: '/',
+        secure:false,
+        sameSite: 'lax'
     }
 }));
 webpush.setGCMAPIKey(process.env.GCMAPIKEY);
@@ -170,19 +172,25 @@ function authenticate(req, staff) {
                 }
             }).then(u => {
                 if (u !== null) {
-                    if (u.password === req.session.user.password) {
-                        if (staff) {
-                            if (u.staff) {
-                                resolve();
+                    if (u.bannedAt === null) {
+                        if (u.password === req.session.user.password) {
+                            if (staff) {
+                                if (u.staff) {
+                                    resolve();
+                                } else {
+                                    reject(true);
+                                }
                             } else {
-                                reject(true);
+                                resolve();
                             }
                         } else {
-                            resolve();
+                            req.session.reset();
+                            reject(false);
                         }
                     } else {
                         req.session.reset();
-                        reject(false);
+                        reject();
+                        return;
                     }
                 } else {
                     req.session.reset();
@@ -218,6 +226,17 @@ app.all('/api/', (req, res) => {
         version: '1.0.9'
     });
 });
+app.use((req, res, next) => {
+    if (req.url.startsWith('/admin')) {
+        if (req.session.user) {
+            user.findOne({ where: { id: req.session.user.id } }).then(u => {
+                if (u === null || u.staff === '') {
+                    res.sendStatus(403);
+                } else next();
+            });
+        } else res.sendStatus(403);
+    } else next();
+})
 app.get('/api/users/', (req, res) => {
     authenticate(req).then(() => {
         let count = parseInt(req.query.count) || 50,
@@ -476,6 +495,51 @@ app.put('/api/user/update/', (req, res) => {
         res.sendStatus(401);
     });
 });
+
+app.patch('/api/user/ban/', (req, res) => {
+    authenticate(req).then(() => {
+        user.findOne({ where: { id: req.session.user.id } }).then(u => {
+            if (u.staff !== '') {
+                let { id } = req.body;
+                if (!id) {
+                    res.sendStatus(400);
+                    return;
+                }
+                user.findOne({ where: { id } }).then(usr => {
+                    usr.update({ bannedAt: new Date(Date.now()).toISOString() }).then(() => {
+                        res.sendStatus(204);
+                    }, err => {
+                        res.status(500).json({ error: 'Internal server error.' });
+                        console.error('bruh ', err);
+                    });
+                });
+            } else res.sendStatus(403);
+        });
+    });
+});
+
+app.patch('/api/user/unban/', (req, res) => {
+    authenticate(req).then(() => {
+        user.findOne({ where: { id: req.session.user.id } }).then(u => {
+            if (u.staff !== '') {
+                let { id } = req.body;
+                if (!id) {
+                    res.sendStatus(400);
+                    return;
+                }
+                user.findOne({ where: { id } }).then(usr => {
+                    usr.update({ bannedAt: null}).then(() => {
+                        res.sendStatus(204);
+                    }, err => {
+                        res.status(500).json({ error: 'Internal server error.' });
+                        console.error('bruh ', err);
+                    });
+                });
+            } else res.sendStatus(403);
+        });
+    });
+});
+
 app.delete('/api/user/delete/', (req, res) => {
     authenticate(req).then(() => {
         let {
@@ -536,23 +600,23 @@ app.delete('/api/user/delete/', (req, res) => {
                                     req.session.reset();
                                     res.sendStatus(200);
                                 }, err => {
-                                    res.sendStatus(500);
+                                    res.status(500).json({ error: 'Internal server error.' });
                                     console.error(err);
                                 });
                             } else {
-                                res.sendStatus(400);
+                                res.status(401).json({ error: 'Invalid password.' });
                                 return;
                             }
                         }), err => {
-                            res.sendStatus(500);
+                            res.status(500).json({ error: 'Internal server error.' });
                             console.error(err);
                         };
                     } else {
                         req.session.reset();
-                        res.sendStatus(401);
+                        res.status(401).json({ error: 'Invalid user.' });
                     }
                 }, err => {
-                    res.sendStatus(500);
+                    res.status(500).json({ error: 'Internal server error.' });
                     console.error(err);
                 });
             }
@@ -594,30 +658,35 @@ app.post('/api/user/login/', (req, res) => {
             }
         }).then(u => {
             if (u !== null) {
-                bcrypt.compare(password, u.password).then(match => {
-                    if (match) {
-                        actions.create({
-                            type: 5,
-                            by: u.id,
-                            to: u.id
-                        }).then(() => {
-                            console.log('User login');
-                        });
-                        req.session.user = u;
-                        res.sendStatus(200);
-                    } else {
-                        res.sendStatus(401);
-                    }
-                }, err => {
-                    res.sendStatus(500);
-                    console.error(err);
-                });
+                if (u.bannedAt === null) {
+                    bcrypt.compare(password, u.password).then(match => {
+                        if (match) {
+                            actions.create({
+                                type: 5,
+                                by: u.id,
+                                to: u.id
+                            }).then(() => {
+                                console.log('User login');
+                            });
+                            req.session.user = u;
+                            res.sendStatus(200);
+                        } else {
+                            res.status(401).json({ error: 'Invalid password.' });
+                        }
+                    }, err => {
+                        res.status(500).json({ error: 'Internal server error.' });
+                        console.error(err);
+                    });
+                } else {
+                    res.status(401).json({ error: 'Banned.' });
+                    return;
+                }
             } else {
-                res.sendStatus(401);
+                res.status(404).json({ error: 'No account.' });
                 return;
             }
         }, err => {
-            res.sendStatus(500);
+            res.status(500).json({ error: 'Internal server error.' });
             console.error(err);
         });
     }
@@ -839,7 +908,7 @@ app.get('/api/user/uploads/', (req, res) => {
                             });
                         });
                     } else {
-                        res.sendStatus(404);
+                        res.status(200).json({ count: 0, uploads: [] });
                     }
                 }).catch(err => {
                     res.sendStatus(500);

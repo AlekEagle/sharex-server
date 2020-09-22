@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <title>AlekEagle ShareX User Dashboard</title>
+        <meta name="theme-color" content="#3a3a3a" />
+        <link
+            rel="shortcut icon"
+            href="https://alekeagle.me/favicon.ico"
+            type="image/x-icon"
+        />
+        <meta property="og:title" content="AlekEagle ShareX User Dashboard" />
+        <meta
+            property="og:description"
+            content="AlekEagle ShareX User Dashboard"
+        />
+        <meta
+            property="og:image"
+            content="https://alekeagle.me/assets/images/me_irl.webp"
+        />
+        <meta name="viewport" content="width=0.7,initial-scale=0.7" />
+        <link
+            href="https://fonts.googleapis.com/css?family=K2D"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="/assets/css/universal.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-3"
+        ></script>
+        <script src="/assets/js/snackbar.js"></script>
+        <script src="/assets/js/reloadOnOnline.js"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'UA-135044771-3');
+        </script>
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                    navigator.serviceWorker.register('/sw.js').then(
+                        function (registration) {
+                            // Registration was successful
+                            console.log(
+                                'ServiceWorker registration successful with scope: ',
+                                registration.scope
+                            );
+                        },
+                        function (err) {
+                            // registration failed :(
+                            console.log(
+                                'ServiceWorker registration failed: ',
+                                err
+                            );
+                        }
+                    );
+                });
+            }
+            let offset = 0,
+                main,
+                size = '12px 0px 30px 0px';
+
+            function createPopup(url, menu) {
+                popupWindow = window.open(
+                    url,
+                    'popUpWindow',
+                    `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
+                );
+            }
+
+            function loadMore() {
+                document.getElementById('loadmore').style.margin = '0px';
+                document.getElementById('load_more').hidden = true;
+                document.getElementById('loading_ani').style.display =
+                    'inline-block';
+                fetch(`/api/users/?offset=${offset}`, {
+                    credentials: 'include',
+                })
+                    .then((res) => {
+                        if (res.status === 200) {
+                            res.json().then((json) => {
+                                document.getElementById(
+                                    'subtitle'
+                                ).innerHTML = `Admin panel for cool people.`;
+                                json = json;
+                                offset += json.length;
+                                json.forEach((i) => {
+                                    let iLink = document.createElement('a');
+                                    iLink.href = `info/?id=${i.id}`;
+                                    let iBox = document.createElement('div');
+                                    iBox.appendChild(iLink);
+                                    let iSpan = document.createElement('span');
+                                    iSpan.classList.add('project_link');
+                                    iBox.classList.add('project');
+                                    iBox.classList.add('float');
+                                    iBox.classList.add('auth');
+                                    iLink.appendChild(iSpan);
+                                    let iTitle = document.createElement('div');
+                                    iBox.appendChild(iTitle);
+                                    iTitle.classList.add('project_title');
+                                    iTitle.innerText = `${i.displayName} (${i.id})`;
+                                    let iDesc = document.createElement('div');
+                                    iBox.appendChild(iDesc);
+                                    iDesc.classList.add('project_description');
+                                    iDesc.innerText = `Click me to view more info about ${i.displayName}`;
+                                    main.appendChild(iBox);
+                                });
+                                if (json.length === 0) {
+                                    document.getElementById(
+                                        'loadmore'
+                                    ).hidden = true;
+                                } else {
+                                    document.getElementById(
+                                        'load_more'
+                                    ).hidden = false;
+                                    document.getElementById(
+                                        'loadmore'
+                                    ).style.margin = size;
+                                    document.getElementById(
+                                        'loading_ani'
+                                    ).style.display = 'none';
+                                }
+                            });
+                        } else {
+                            document.location.href = `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
+                        }
+                    })
+                    .catch((err) => {
+                        help(
+                            'It appears you are offline. Please try again later.'
+                        );
+                        document.getElementById('load_more').hidden = false;
+                        document.getElementById('loadmore').style.margin = size;
+                        document.getElementById('loading_ani').style.display =
+                            'none';
+                    });
+            }
+
+            function init() {
+                main = document.getElementById('projects');
+                document.getElementById('loadmore').style.margin = '0px';
+                document.getElementById('load_more').hidden = true;
+                document.getElementById('loading_ani').style.display =
+                    'inline-block';
+                main = document.getElementById('projects');
+                fetch('/api/authenticate/', {
+                    credentials: 'include',
+                })
+                    .then((res) => {
+                        if (res.status !== 200) {
+                            document.location.href = `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
+                            return;
+                        } else {
+                            fetch('/api/users/', {
+                                credentials: 'include',
+                            }).then((res) => {
+                                if (res.status === 200) {
+                                    res.json().then((json) => {
+                                        document.getElementById(
+                                            'subtitle'
+                                        ).innerHTML = `Admin panel for cool people.`;
+                                        json = json;
+                                        offset += json.length;
+                                        json.forEach((i) => {
+                                            let iLink = document.createElement(
+                                                'a'
+                                            );
+                                            iLink.href = `info/?id=${i.id}`;
+                                            let iBox = document.createElement(
+                                                'div'
+                                            );
+                                            iBox.appendChild(iLink);
+                                            let iSpan = document.createElement(
+                                                'span'
+                                            );
+                                            iSpan.classList.add('project_link');
+                                            iBox.classList.add('project');
+                                            iBox.classList.add('float');
+                                            iBox.classList.add('auth');
+                                            iLink.appendChild(iSpan);
+                                            let iTitle = document.createElement(
+                                                'div'
+                                            );
+                                            iBox.appendChild(iTitle);
+                                            iTitle.classList.add(
+                                                'project_title'
+                                            );
+                                            iTitle.innerText = `${i.displayName} (${i.id})`;
+                                            let iDesc = document.createElement(
+                                                'div'
+                                            );
+                                            iBox.appendChild(iDesc);
+                                            iDesc.classList.add(
+                                                'project_description'
+                                            );
+                                            iDesc.innerText = `Click me to view more info about ${i.displayName}`;
+                                            main.appendChild(iBox);
+                                        });
+                                        if (json.length === 0) {
+                                            document.getElementById(
+                                                'loadmore'
+                                            ).hidden = true;
+                                        } else {
+                                            document.getElementById(
+                                                'load_more'
+                                            ).hidden = false;
+                                            document.getElementById(
+                                                'loadmore'
+                                            ).style.margin = size;
+                                            document.getElementById(
+                                                'loading_ani'
+                                            ).style.display = 'none';
+                                        }
+                                    });
+                                } else {
+                                    document.location.href = `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
+                                }
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        help(
+                            'It appears you are offline. Please try again later.'
+                        );
+                        document.getElementById('load_more').hidden = false;
+                        document.getElementById('loadmore').style.margin = size;
+                        document.getElementById('loading_ani').style.display =
+                            'none';
+                    });
+            }
+            document.addEventListener('readystatechange', (e) => {
+                if (document.readyState === 'interactive') {
+                    init();
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <header class="header">
+            <div class="header__inner">
+                <a href="/">
+                    <img
+                        class="header__logo"
+                        src="/assets/images/me_irl.webp"
+                        style="border-radius: 50%; height: 90px"
+                        alt="AlekEagle"
+                    />
+                    <h1 class="header__title">Your Uploads</h1>
+                </a>
+                <br /><a href="/me/"
+                    ><button class="button header_button">Back</button></a
+                >
+            </div>
+        </header>
+        <div class="under_header"></div>
+        <p id="subtitle" class="subtitle">Admin panel for cool people.</p>
+        <div id="projects" class="projects"></div>
+        <div class="footer_box">
+            <div class="loadmore" id="loadmore">
+                <a
+                    href="javascript:loadMore()"
+                    hidden
+                    id="load_more"
+                    class="footer_text"
+                    >Load More..</a
+                >
+                <div id="loading_ani" class="lds-ellipsis">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+            <div class="cpyrit">
+                <a href="https://alekeagle.com" class="footer_text"
+                    >© 2019-2020 AlekEagle</a
+                >
+            </div>
+        </div>
+        <div id="snackbar"></div>
+    </body>
+</html>

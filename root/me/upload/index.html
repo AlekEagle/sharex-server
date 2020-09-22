@@ -7,7 +7,7 @@
         <link rel="shortcut icon" href="https://alekeagle.me/favicon.ico" type="image/x-icon" />
         <meta property="og:title" content="AlekEagle ShareX User Dashboard">
         <meta property="og:description" content="AlekEagle ShareX User Dashboard" />
-        <meta property="og:image" content="https://alekeagle.me/assets/images/me_irl.png">
+        <meta property="og:image" content="https://alekeagle.me/assets/images/me_irl.webp">
         <meta name="viewport" content="width=0.7,initial-scale=0.7">
         <link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet" type="text/css">
         <link href="/assets/css/universal.css" rel="stylesheet" type="text/css">
@@ -135,6 +135,24 @@
             }
 
             function init() {
+                navigator.serviceWorker.addEventListener('message', event => {
+                    console.log(event.data);
+                    console.log(event.data.action === 'load-image');
+                    if(event.data.action === 'load-image') {
+                        let fileSelector = document.getElementById('uploadlbl');
+                        console.log(fileSelector);
+                        files = [];
+                        files[0] = event.data.file;
+                        if (files) {
+                            fileSelector.innerText = files[0].name;
+                        } else {
+                            fileSelector.innerText = 'Your file here';
+                        }
+                    }
+                });
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.active.postMessage({action: 'ready'});
+                });
                 document.getElementById('uploadlbl').addEventListener('dragover', e => {
                     FileDragHover(e);
                     e.target.innerText = 'Drop it right here!';
@@ -222,7 +240,7 @@
         <header class="header">
             <div class="header__inner">
                 <a href="/">
-                    <img class="header__logo" src="/assets/images/me_irl.png" style="border-radius: 50%;height: 90px;"
+                    <img class="header__logo" src="/assets/images/me_irl.webp" style="border-radius: 50%;height: 90px;"
                         alt="AlekEagle">
                     <h1 class="header__title">
                         Direct Upload

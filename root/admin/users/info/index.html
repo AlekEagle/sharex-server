@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <title>AlekEagle ShareX User Dashboard</title>
+        <meta name="theme-color" content="#3a3a3a" />
+        <link
+            rel="shortcut icon"
+            href="https://alekeagle.me/favicon.ico"
+            type="image/x-icon"
+        />
+        <meta property="og:title" content="AlekEagle ShareX User Dashboard" />
+        <meta
+            property="og:description"
+            content="AlekEagle ShareX User Dashboard"
+        />
+        <meta
+            property="og:image"
+            content="https://alekeagle.me/assets/images/me_irl.webp"
+        />
+        <meta name="viewport" content="width=0.7,initial-scale=0.7" />
+        <link
+            href="https://fonts.googleapis.com/css?family=K2D"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <link
+            href="/assets/css/universal.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <link rel="manifest" href="/manifest.json" />
+        <!-- 
+        <canvas id="bgCanvas"></canvas>
+        <script type="text/javascript" src="assets/js/classical-noise.js"></script>
+        <script type="text/javascript" src="assets/js/bgAnimation.js"></script> -->
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-3"
+        ></script>
+        <script src="/assets/js/snackbar.js"></script>
+        <script src="/assets/js/reloadOnOnline.js"></script>
+        <script src="/assets/js/memory.js"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'UA-135044771-3');
+        </script>
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                    navigator.serviceWorker.register('/sw.js').then(
+                        function (registration) {
+                            // Registration was successful
+                            console.log(
+                                'ServiceWorker registration successful with scope: ',
+                                registration.scope
+                            );
+                        },
+                        function (err) {
+                            // registration failed :(
+                            console.log(
+                                'ServiceWorker registration failed: ',
+                                err
+                            );
+                        }
+                    );
+                });
+            }
+            let months = [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December',
+            ];
+            let days = [
+                'Sunday',
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday',
+            ];
+            let queryObj = JSON.parse(
+                `{${document.location.search
+                    .replace(/\?/, '')
+                    .split('&')
+                    .map((q) => `"${q.split('=')[0]}": "${q.split('=')[1]}"`)
+                    .join(', ')}}`
+            );
+
+            function createPopup(url, menu) {
+                popupWindow = window.open(
+                    url,
+                    'popUpWindow',
+                    `height=650,width=850,left=50,top=50,resizeable=yes,scrollbars=yes,toolbar=yes,menubar=${menu},location=no,directories=no,status=yes`
+                );
+            }
+
+            function confirmBan(id) {
+                if (
+                    confirm(
+                        `Are you sure you want to ban user with ID: ${id}? THIS CANNOT BE UNDONE.`
+                    )
+                ) {
+                    banUser(id);
+                }
+            }
+
+            function banUser(id) {
+                fetch('/api/user/ban/', {
+                    method: 'PATCH',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id,
+                    }),
+                }).then((res) => {
+                    switch (res.status) {
+                        case 204:
+                            history.back();
+                            break;
+                        case 401:
+                            document.getElementById('ban_err').innerText =
+                                'You are unauthorized to preform this action. Try signing out and back in.';
+                            break;
+                        case 500:
+                            document.getElementById('ban_err').innerText =
+                                'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
+                    }
+                });
+            }
+
+            function confirmUnban(id) {
+                if (
+                    confirm(
+                        `Are you sure you want to unban user with ID: ${id}? THIS CANNOT BE UNDONE.`
+                    )
+                ) {
+                    unbanUser(id);
+                }
+            }
+
+            function unbanUser(id) {
+                fetch('/api/user/unban/', {
+                    method: 'PATCH',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id,
+                    }),
+                }).then((res) => {
+                    switch (res.status) {
+                        case 204:
+                            history.back();
+                            break;
+                        case 401:
+                            document.getElementById('ban_err').innerText =
+                                'You are unauthorized to preform this action. Try signing out and back in.';
+                            break;
+                        case 500:
+                            document.getElementById('ban_err').innerText =
+                                'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
+                    }
+                });
+            }
+
+            function init() {
+                fetch('/api/authenticate/', {
+                    credentials: 'include',
+                })
+                    .then((res) => {
+                        if (res.status !== 200) {
+                            document.location.href = `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
+                            return;
+                        } else {
+                            if (!queryObj.id) {
+                                document.location.href = `${document.location.protocol}//${document.location.host}/admin/users/`;
+                                return;
+                            }
+                            fetch(`/api/user/?id=${queryObj.id}`, {
+                                credentials: 'include',
+                            }).then((res) => {
+                                if (res.status === 200) {
+                                    res.json().then((json) => {
+                                        document
+                                            .getElementById('ban')
+                                            .addEventListener(
+                                                'click',
+                                                () => json.bannedAt !== null ? confirmUnban(json.id) : confirmBan(json.id),
+                                                false
+                                            );
+                                        fetch(
+                                            `/api/user/uploads/?id=${json.id}`,
+                                            { credentials: 'include' }
+                                        )
+                                            .then(r => r.json()
+                                            .then((e) => {
+                                                document.getElementById(
+                                                    'metadata'
+                                                ).innerHTML = `Joined on: ${
+                                                    days[
+                                                        new Date(
+                                                            json.createdAt
+                                                        ).getDay()
+                                                    ]
+                                                } - ${
+                                                    months[
+                                                        new Date(
+                                                            json.createdAt
+                                                        ).getMonth()
+                                                    ]
+                                                } ${
+                                                    days[
+                                                        new Date(
+                                                            json.createdAt
+                                                        ).getDay()
+                                                    ]
+                                                } ${new Date(
+                                                    json.createdAt
+                                                ).getDate()} - ${new Date(
+                                                    json.createdAt
+                                                ).getFullYear()}<br>Username: ${
+                                                    json.username
+                                                }<br>Display Name: ${
+                                                    json.displayName
+                                                }<br>Upload Count: ${
+                                                  e.count
+                                                }<br>Staff: ${json.staff !== '' ? json.staff : 'No.'}<br>Banned on: ${ json.bannedAt ? `${
+                                                    days[
+                                                        new Date(
+                                                            json.createdAt
+                                                        ).getDay()
+                                                    ]
+                                                } - ${
+                                                    months[
+                                                        new Date(
+                                                            json.createdAt
+                                                        ).getMonth()
+                                                    ]
+                                                } ${
+                                                    days[
+                                                        new Date(
+                                                            json.createdAt
+                                                        ).getDay()
+                                                    ]
+                                                } ${new Date(
+                                                    json.createdAt
+                                                ).getDate()} - ${new Date(
+                                                    json.createdAt
+                                                ).getFullYear()}` : 'Not banned'}`;
+                                                document.getElementById(
+                                                    'uploads_link'
+                                                ).href = `${document.location.protocol}//${document.location.host}/admin/uploads/?id=${json.id}`;
+                                            }));
+                                    });
+                                } else {
+                                    document.location.href = `${document.location.protocol}//${document.location.host}/auth/?redirect=${document.location.pathname}`;
+                                }
+                            });
+                        }
+                    })
+                    .catch((err) => {});
+            }
+            document.addEventListener('readystatechange', (e) => {
+                if (document.readyState === 'interactive') {
+                    init();
+                }
+            });
+        </script>
+    </head>
+
+    <body>
+        <header class="header">
+            <div class="header__inner">
+                <a href="/">
+                    <img
+                        class="header__logo"
+                        src="/assets/images/me_irl.webp"
+                        style="border-radius: 50%; height: 90px"
+                        alt="AlekEagle"
+                    />
+                    <h1 class="header__title">User Info</h1>
+                </a>
+                <br /><a href="/admin/users/"
+                    ><button class="button header_button">Back</button></a
+                >
+            </div>
+        </header>
+        <div class="under_header"></div>
+        <p class="subtitle">Various info about this user.</p>
+        <div class="projects">
+            <div class="project float auth">
+                <a id="uploads_link" target="_blank"
+                    ><span class="project_link"></span
+                ></a>
+                <div class="project_title">User info</div>
+                <div id="metadata" class="project_description"></div>
+            </div>
+            <div id="ban" class="project float auth">
+                <div class="project_title">Ban/Unban the user</div>
+                <div id="metadata" class="project_description">
+                    This will ban/unban the user!
+                    <br />
+                    <p hidden id="ban_err"></p>
+                </div>
+            </div>
+        </div>
+        <div class="footer_box">
+            <a href="https://alekeagle.com" class="footer_text"
+                >© 2019-2020 AlekEagle</a
+            >
+        </div>
+        <div id="snackbar"></div>
+    </body>
+</html>
