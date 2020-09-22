@@ -1,4 +1,4 @@
-let CACHE_NAME = 'v23';
+let CACHE_NAME = 'v3';
 let expectedCaches = [CACHE_NAME];
 let urlsToCache = [
     'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js',
