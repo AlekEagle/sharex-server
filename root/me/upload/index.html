@@ -137,7 +137,10 @@
             function init() {
                 navigator.serviceWorker.addEventListener('message', event => {
                     console.log(event.data);
-                    console.log(event.data.action === 'load-image');
+                    if(event.data === null) {
+                        help("It appears something went wrong when receiving the file, if this issue continues, please contact Alek.");
+                        return;
+                    }
                     if(event.data.action === 'load-image') {
                         let fileSelector = document.getElementById('uploadlbl');
                         console.log(fileSelector);
