@@ -59,8 +59,14 @@ self.addEventListener('fetch', function (event) {
     if (event.request.method === 'POST' && event.request.url.includes('/me/upload/')) {
         event.respondWith((async () => {
             const formData = await event.request.formData();
-            const shareFile = formData.get('file');
-            file = shareFile;
+            const file = formData.get('file');
+            function recieveReadyMessage(event) {
+                if (event.data.action === 'receive-share-file') {
+                    event.source.postMessage({file, action: 'load-image'});
+                    self.removeEventListener('message', recieveReadyMessage);
+                }
+            }
+            self.addEventListener('message', recieveReadyMessage);
             return Response.redirect('/me/upload/', 303);
         })());
     } else if (event.request.method !== 'POST') {
@@ -97,13 +103,5 @@ self.addEventListener('fetch', function (event) {
         );
     } else {
         event.respondWith(fetch(event.request).then(res => { return res; }));
-    }
-});
-
-self.addEventListener('message', event => {
-    if (event.data.action === 'receive-share-file' && file !== null) {
-        setTimeout(() => { 
-            event.source.postMessage({ file, action: 'load-image' });
-        }, 1000);
     }
 });

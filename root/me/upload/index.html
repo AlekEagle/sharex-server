@@ -43,7 +43,7 @@
                     });
                 });
             }
-            let files;
+            let files = [];
 
             function createPopup(url, menu) {
                 popupWindow = window.open(url, 'popUpWindow',
@@ -136,15 +136,12 @@
 
             function init() {
                 function recieveMessage(event) {
-                    console.log(event);
-                    setTimeout(() =>console.log(event),1000);
                     if(event.data === null || event.data.file === null) {
                         help("It appears something went wrong when receiving the file, this normally happens with large files, if this issue continues, please contact Alek.");
+                        return;
                     }
                     if(event.data.action === 'load-image') {
                         let fileSelector = document.getElementById('uploadlbl');
-                        console.log(fileSelector);
-                        files = [];
                         files[0] = event.data.file;
                         if (files) {
                             fileSelector.innerText = files[0].name;
