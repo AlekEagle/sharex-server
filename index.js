@@ -138,12 +138,12 @@ const corsOptions = {
     origin: true,
     optionsSuccessStatus: 200
 }
-let https = require('http'),
+let https = require('https'),
     app = require('express')();
 app.use(cors(corsOptions));
 app.engine('html', require('mustache-express')());
 app.use(express.json());
-let server = https.createServer(/* options, */ app);
+let server = https.createServer(options, app);
 app.use(session({
     cookieName: 'session',
     secret: Math.random().toString(),
