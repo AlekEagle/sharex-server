@@ -1,4 +1,4 @@
-let CACHE_NAME = 'vjazz';
+let CACHE_NAME = 'v1';
 let expectedCaches = [CACHE_NAME];
 let urlsToCache = [
     'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js',
@@ -17,6 +17,7 @@ let urlsToCache = [
     '/assets/js/snackbar.js',
     '/assets/js/reloadOnOnline.js'
 ];
+let file = null;
 
 self.addEventListener('install', function (event) {
     self.skipWaiting();
@@ -58,8 +59,8 @@ self.addEventListener('fetch', function (event) {
     if (event.request.method === 'POST' && event.request.url.includes('/me/upload/')) {
         event.respondWith((async () => {
             const formData = await event.request.formData();
-            const file = formData.get('file');
-            self.parent.postMessage({file, action: 'load-image'}, null, file);
+            const shareFile = formData.get('file');
+            file = shareFile;
             return Response.redirect('/me/upload/', 303);
         })());
     } else if (event.request.method !== 'POST') {
@@ -96,5 +97,13 @@ self.addEventListener('fetch', function (event) {
         );
     } else {
         event.respondWith(fetch(event.request).then(res => { return res; }));
+    }
+});
+
+self.addEventListener('message', event => {
+    if (event.data.action === 'receive-share-file' && file !== null) {
+        setTimeout(() => { 
+            event.source.postMessage({ file, action: 'load-image' });
+        }, 1000);
     }
 });
