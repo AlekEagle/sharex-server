@@ -139,7 +139,7 @@
                     console.log(event);
                     setTimeout(() =>console.log(event),1000);
                     if(event.data === null || event.data.file === null) {
-                        help("It appears something went wrong when receiving the file, if this issue continues, please contact Alek.");
+                        help("It appears something went wrong when receiving the file, this normally happens with large files, if this issue continues, please contact Alek.");
                     }
                     if(event.data.action === 'load-image') {
                         let fileSelector = document.getElementById('uploadlbl');
