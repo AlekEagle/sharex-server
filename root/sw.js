@@ -1,6 +1,6 @@
-var CACHE_NAME = 'v3';
-var expectedCaches = [CACHE_NAME];
-var urlsToCache = [
+let CACHE_NAME = 'v4';
+let expectedCaches = [CACHE_NAME];
+let urlsToCache = [
     'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js',
     'https://fonts.googleapis.com/css?family=K2D',
     'https://fonts.gstatic.com/s/k2d/v3/J7aTnpF2V0EjZKUsrLc.woff2',
@@ -17,6 +17,7 @@ var urlsToCache = [
     '/assets/js/snackbar.js',
     '/assets/js/reloadOnOnline.js'
 ];
+let file;
 
 self.addEventListener('install', function (event) {
     self.skipWaiting();
@@ -58,14 +59,8 @@ self.addEventListener('fetch', function (event) {
     if (event.request.method === 'POST' && event.request.url.includes('/me/upload/')) {
         event.respondWith((async () => {
             const formData = await event.request.formData();
-            const file = formData.get('file');
-            function recieveReadyMessage(event) {
-                if (event.data.action === 'ready') {
-                    event.source.postMessage({file, action: 'load-image'});
-                    self.removeEventListener('message', recieveReadyMessage);
-                }
-            }
-            self.addEventListener('message', recieveReadyMessage);
+            const shareFile = formData.get('file');
+            file = shareFile;
             return Response.redirect('/me/upload/', 303);
         })());
     } else if (event.request.method !== 'POST') {
@@ -105,6 +100,9 @@ self.addEventListener('fetch', function (event) {
     }
 });
 
-self.addEventListener('push', event => {
-
-})
+self.addEventListener('message', event => {
+    if(event.data.action === 'receive-share-file') {
+        event.source.postMessage({file, action: 'load-image'});
+        file = null;
+    }
+});

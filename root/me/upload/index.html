@@ -154,7 +154,7 @@
                     }
                 });
                 navigator.serviceWorker.ready.then(registration => {
-                    registration.active.postMessage({action: 'ready'});
+                    registration.active.postMessage({action: 'receive-share-file'});
                 });
                 document.getElementById('uploadlbl').addEventListener('dragover', e => {
                     FileDragHover(e);
