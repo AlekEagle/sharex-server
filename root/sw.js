@@ -1,4 +1,4 @@
-let CACHE_NAME = 'v2';
+let CACHE_NAME = 'v3';
 let expectedCaches = [CACHE_NAME];
 let urlsToCache = [
     'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js',
@@ -15,7 +15,8 @@ let urlsToCache = [
     '/assets/images/me_irl.webp',
     '/assets/images/empty.gif',
     '/assets/js/snackbar.js',
-    '/assets/js/reloadOnOnline.js'
+    '/assets/js/reloadOnOnline.js',
+    '/brew-coffee/'
 ];
 let file = null;
 
