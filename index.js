@@ -273,7 +273,10 @@ app.get('/api/users/', (req, res) => {
     }).catch(() => {
         res.sendStatus(401);
     });
-})
+});
+app.get('/api/brew-coffee', (req, res) => {
+    res.status(418).json({error: 'I\'m a teapot.', body: 'The requested entitiy body is short and stout.', addInfo: 'Tip me over and pour me out.'});
+});
 app.get('/api/user/', (req, res) => {
     authenticate(req).then(() => {
         if (!req.query.id) res.sendStatus(400);
