@@ -142,6 +142,7 @@ body {
   margin-left: 0;
   margin-right: 0;
   margin-top: 0;
+  overflow: overlay;
 }
 
 button.button {
@@ -229,7 +230,7 @@ video {
 }
 
 ::-webkit-scrollbar-track {
-  background-color: #212121;
+  background-color: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -434,17 +435,19 @@ select {
 }
 
 .project {
-  font-size: 16px;
-  margin: 10px;
-  padding: 5px 7.5px 15px 7.5px;
-  background: #1d1d1d;
-  border-radius: 10px;
-  border: 1px solid #1d1d1d;
-  float: left;
-  transition: 0.3s;
-  outline: none;
-  align-self: stretch;
-  position: relative;
+    font-size: 16px;
+    margin: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    background: #1d1d1d;
+    border-radius: 10px;
+    border: 1px solid #1d1d1d;
+    float: left;
+    transition: 0.3s;
+    cursor: pointer;
+    outline: none;
+    align-self: stretch;
+    position: relative;
 }
 
 .footer_box .loadmore,
@@ -460,14 +463,14 @@ select {
   transition: 0.3s;
 }
 
-.project:focus:not(.float):not(.sink) {
+.project:focus:not(.float):not(.sink):not(.disabled) {
   background: #252525;
   box-shadow: 13px 13px 5px #141414b0;
   border: 1px solid #505050;
   transform: translate(-7px, -7px);
 }
 
-.project:hover:not(.float):not(.sink) {
+.project:hover:not(.float):not(.sink):not(.disabled) {
   background: #252525;
   box-shadow: 13px 13px 5px #141414b0;
   border: 1px solid #505050;
@@ -610,28 +613,40 @@ select {
   background-color: #1f1f1f;
 }
 
-@media screen and (max-width: 789px) {
-  .project {
-    width: calc((100vw - (22px * 3)) / 1);
-  }
+@media screen and (max-width: 589px) {
+    .project {
+        width:calc((100% - (32px * 1))/1)
+    }
 }
 
-@media screen and (min-width: 790px) and (max-width: 1152px) {
-  .project {
-    width: calc((100vw - (22px * 3 + (5px * 9))) / 2);
-  }
+@media screen and (min-width: 590px) and (max-width:1152px) {
+    .project {
+        width:calc((100% - (32px * 2))/2)
+    }
 }
 
-@media screen and (min-width: 1153px) and (max-width: 1366px) {
-  .project {
-    width: calc((100vw - (22px * 3 + (5px * 14))) / 3);
-  }
+@media screen and (min-width: 1153px) and (max-width:1366px) {
+    .project {
+        width:calc((100% - (32px * 3))/3)
+    }
 }
 
-@media screen and (min-width: 1367px) {
-  .project {
-    width: calc((100vw - (22px * 3 + (5px * 21))) / 4);
-  }
+@media screen and (min-width: 1367px) and (max-width: 1699px) {
+    .project {
+        width:calc((100% - (32px * 4))/4)
+    }
+}
+
+@media screen and (min-width: 1700px) and (max-width: 2099px) {
+    .project {
+        width:calc((100% - (32px * 5))/5)
+    }
+}
+
+@media screen and (min-width: 2100px) {
+.project {
+        width:calc((100% - (32px * 6))/6)
+    }
 }
 
 @keyframes glow {
@@ -662,33 +677,33 @@ select {
   }
 }
 
-.float:hover {
+.project.float:hover:not(.disabled) {
   background: #202020;
   box-shadow: 13px 13px 5px #141414b0;
   border: 1px solid #505050;
   transform: translate(-7px, -7px);
 }
 
-.sink:hover {
+.project.sink:hover:not(.disabled) {
   box-shadow: inset 13px 13px 5px #141414b0;
   border: 1px solid #505050;
 }
 
-.sink:hover * {
+.project.sink:hover:not(.disabled) * {
   transform: translate(7px, 7px);
 }
 
-.float:focus {
+.project.float:focus:not(.disabled) {
   background: #252525;
   box-shadow: 13px 13px 5px #141414b0;
   border: 1px solid #505050;
 }
 
-.sink:focus * {
+.project.project.sink:focus:not(.disabled) * {
   transform: translate(7px, 7px);
 }
 
-.sink:focus {
+.project.sink:focus:not(.disabled) {
   box-shadow: inset 13px 13px 5px #141414b0;
   border: 1px solid #505050;
 }
@@ -836,3 +851,22 @@ select {
     transform: translate(19px, 0);
   }
 }
+
+.project_link.disabled {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    cursor: not-allowed;
+    background: #00000099;
+    border-radius: 10px;
+    border: 1px solid #1d1d1d;
+  
+    z-index: 2;
+  
+    /* fixes overlap error in IE7/8, 
+         make sure you have an empty gif */
+    background-image: url("/assets/images/empty.gif");
+  }
+  

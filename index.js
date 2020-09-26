@@ -34,6 +34,10 @@ const fs = require('fs'),
     },
     port = process.argv[2] || 3000;
 
+function random(min, max) {
+    return Math.floor(Math.random()*(max-min+1)+min);
+}
+
 dotenv.config();
 const sequelize = new Sequelize({
     database: process.env.SERVERDB,
@@ -231,10 +235,10 @@ app.use((req, res, next) => {
         if (req.session.user) {
             user.findOne({ where: { id: req.session.user.id } }).then(u => {
                 if (u === null || u.staff === '') {
-                    res.sendStatus(403);
+                    res.status(403).render(`${__dirname}/views/err404.html`, {statuscode: res.statusCode});
                 } else next();
             });
-        } else res.sendStatus(403);
+        } else res.status(403).render(`${__dirname}/views/err404.html`, {statuscode: res.statusCode});
     } else next();
 })
 app.get('/api/users/', (req, res) => {
@@ -275,7 +279,10 @@ app.get('/api/users/', (req, res) => {
     });
 });
 app.get('/api/brew-coffee/', (req, res) => {
-    res.status(418).json({error: 'I\'m a teapot.', body: 'The requested entitiy body is short and stout.', addInfo: 'Tip me over and pour me out.'});
+    let ran = random(10000, 30000);
+    setTimeout(() => {
+        res.status(418).json({error: 'I\'m a teapot.', body: 'The requested entitiy body is short and stout.', addInfo: 'Tip me over and pour me out.'});
+    }, ran);
 });
 app.get('/api/user/', (req, res) => {
     authenticate(req).then(() => {
@@ -1123,7 +1130,7 @@ app.post('/upload/', upload.single('file'), (req, res) => {
     }
 });
 app.use(express.static('root', { acceptRanges: false }), (req, res, next) => {
-    res.status(404).sendFile(`${__dirname}/views/err404.html`);
+    res.status(404).render(`${__dirname}/views/err404.html`, {statuscode: res.statusCode});
 });
 
 server.listen(port);

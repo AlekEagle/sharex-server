@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>ERR 404 NOT FOUND</title>
+        <title>ERR {{statuscode}}</title>
         <link rel="shortcut icon" href="https://alekeagle.com/favicon.ico" type="image/x-icon" />
-        <meta name="description" content="ERROR 404 PAGE NOT FOUND" />
-        <meta property="og:description" content="ERROR 404 PAGE NOT FOUND" />
-        <meta property="og:image" content="/assets/images/monkey-typewriter.png" />
+        <meta name="description" content="ERROR {{statuscode}}" />
+        <meta property="og:description" content="ERROR {{statuscode}}" />
         <link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet" type="text/css">
         <link href="/assets/css/universal.css" rel="stylesheet" type="text/css"><!-- 
         <canvas id="bgCanvas"></canvas>
@@ -23,5 +22,6 @@
     </head>
     <body>
         <h1>Hmm, it seems that either you got lost or we did, either way you aren't supposed to be here intentionally. We recommend you <a href="javascript:history.back()">tracing your steps</a> to figure out where you got lost.<h1>
+            <img src="https://http.cat/{{statuscode}}" alt="error {{statuscode}} cat">
     </body>
 <html>

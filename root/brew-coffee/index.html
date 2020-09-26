@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>AlekEagle Coffee Kettle</title>
+        <link rel="shortcut icon" href="https://alekeagle.com/favicon.ico" type="image/x-icon" />
+        <meta name="description" content="AlekEagle Coffee Kettle" />
+        <meta property="og:description" content="Easily brew coffee without leaving your desk!" />
+        <link href="https://fonts.googleapis.com/css?family=K2D" rel="stylesheet" type="text/css">
+        <link href="/assets/css/universal.css" rel="stylesheet" type="text/css"><!-- 
+        <canvas id="bgCanvas"></canvas>
+        <script type="text/javascript" src="assets/js/classical-noise.js"></script>
+        <script type="text/javascript" src="assets/js/bgAnimation.js"></script> -->
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135044771-3"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-135044771-3');
+        </script>
+        <script defer>
+            setTimeout((function() {
+                let beginBrewBtn = document.getElementById('beginBrew');
+                beginBrewBtn.addEventListener('click', e => {
+                    if(beginBrewBtn.classList.contains('disabled')) return;
+                    if (document.getElementById('status')) {
+                        document.getElementById('status').remove();
+                    }
+                    beginBrewBtn.classList.add('disabled');
+                    let disabledOverlay = document.createElement('div');
+                    disabledOverlay.classList.add('disabled');
+                    disabledOverlay.classList.add('project_link');
+                    beginBrewBtn.prepend(disabledOverlay);
+                    let iBox1 = document.createElement('div');
+                    iBox1.classList.add('project');
+                    iBox1.classList.add('float');
+                    iBox1.classList.add('auth');
+                    iBox1.id = 'status';
+                    let iTitle1 = document.createElement('div');
+                    iBox1.appendChild(iTitle1);
+                    iTitle1.classList.add('project_title');
+                    iTitle1.innerText = 'Contacting kettle...';
+                    let iDesc1 = document.createElement('div');
+                    iBox1.appendChild(iDesc1);
+                    iDesc1.classList.add('project_description');
+                    iDesc1.innerHTML = '<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>';
+                    document.getElementById('projects').appendChild(iBox1);
+                    setTimeout(() => {
+                        iTitle1.innerText = 'Waiting for response...';
+                    }, 2000);
+                    fetch('/api/brew-coffee/').then(res => res.json().then(json => {
+                        iBox1.classList.remove('auth');
+                        let iIcon1 = document.createElement('img');
+                        iIcon1.classList.add('project_icon');
+                        iIcon1.src = '/assets/images/warning.png';
+                        iBox1.prepend(iIcon1);
+                        iDesc1.innerText = Object.keys(json).map((v, i, a) => `${v}: ${Object.values(json)[i]}`).join('\n');
+                        iTitle1.innerText = 'The kettle is a teapot?';
+                        beginBrewBtn.removeChild(disabledOverlay);
+                        beginBrewBtn.classList.remove('disabled');
+                    }));
+                });
+            }), 500);
+        </script>
+    </head>
+    <body>
+        <header class="header">
+            <div class="header__inner">
+                <a href="/">
+                    <img
+                        class="header__logo"
+                        src="/assets/images/me_irl.webp"
+                        style="border-radius: 50%; height: 90px"
+                        alt="AlekEagle"
+                    />
+                    <h1 class="header__title">User Info</h1>
+                </a>
+                <br /><a href="/admin/users/"
+                    ><button class="button header_button">Back</button></a
+                >
+            </div>
+        </header>
+        <div class="under_header"></div>
+        <p class="subtitle">Get your energy through the roof with coffee!</p>
+        <div class="projects" id="projects">
+            <div class="project float" id="beginBrew">
+                <a href="#"><span class="project_link"></span></a>
+                <img class="project_icon" src="/assets/images/coffee.png">
+                <div class="project_title">Click for coffee!</div>
+                <div class="project_description">This will start brewing coffee on your Hyper Text Coffee Pot Control Protocol (HTCPCP) enabled coffee pot!</div>
+            </div>
+    </body>
+<html>
