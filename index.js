@@ -902,7 +902,7 @@ app.get('/api/user/uploads/', (req, res) => {
                     if (u.length !== 0) {
                         uploads.findAll({
                             where: {
-                                userid: req.session.user.id
+                                userid: id
                             }
                         }).then(count => {
                             res.status(200).json({
