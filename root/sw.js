@@ -1,4 +1,4 @@
-let CACHE_NAME = 'v2';
+let CACHE_NAME = 'v3';
 let expectedCaches = [CACHE_NAME];
 let urlsToCache = [
     'https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js',
@@ -63,7 +63,7 @@ self.addEventListener('fetch', function (event) {
             const file = formData.get('file');
             function recieveReadyMessage(event) {
                 if (event.data.action === 'receive-share-file') {
-                    event.source.postMessage({file, action: 'load-image'});
+                    event.source.postMessage({ file, action: 'load-image' });
                     self.removeEventListener('message', recieveReadyMessage);
                 }
             }

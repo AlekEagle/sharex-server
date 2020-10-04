@@ -89,6 +89,11 @@
                         domain.value = js.domain;
                         subdomain.value = js.subdomain;
                     });
+                    domain.addEventListener('change', e => {
+                        subdomain.value = json.find(a => a.domain === e.target.value).allowsSubdomains ? subdomain.value : '';
+                        subdomain.title = json.find(a => a.domain === e.target.value).allowsSubdomains ? '' : 'This domain doesn\'t support subdomains, there\'s a fix on the way to patch that, but until then, sorry!';
+                        subdomain.disabled = !json.find(a => a.domain === e.target.value).allowsSubdomains;
+                    });
                 });
 
                 function editSelf(e) {
@@ -284,6 +289,12 @@
                                     document.getElementById('subdomain').value = domain.subdomain;
                                 });
                                 break;
+                            case 400:
+                                document.getElementById('domain_err').innerText = 'You somehow asked for a domain that doesn\'t support subdomains with a subdomain! Try refreshing or contact AlekEagle about the issue.';
+                            break;
+                            case 404:
+                                document.getElementById('domain_err').innerText = 'We must\'ve JUST updated our domain list, and that domain is no longer available, if you would like to use it, please contact AlekEagle to work something out.';
+                            break;
                             case 500:
                                 document.getElementById('domain_err').innerText =
                                     'An unknown error occurred server side, please try again later. If this issue persists contact AlekEagle.';
@@ -354,7 +365,7 @@
                 <div class="project_description">
                     <p>Choose your favorite domain and subdomain options!</p>
                     <input type="text" id="subdomain" placeholder="Subdomain" class="darktextbox"
-                        autocomplete="off"></input><select id="domain"></select>
+                        autocomplete="off"></input><p id="dotseperator">.</p><select id="domain"></select>
                     <br>
                     <button id="domain_sel" class="button">I want that one</button>
                     <p id="domain_err" class="error_text"></p>

@@ -35,7 +35,7 @@ const fs = require('fs'),
     port = process.argv[2] || 3000;
 
 function random(min, max) {
-    return Math.floor(Math.random()*(max-min+1)+min);
+    return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 dotenv.config();
@@ -113,7 +113,8 @@ domains.init({
     domain: {
         type: Sequelize.STRING,
         primaryKey: true
-    }
+    },
+    allowsSubdomains: Sequelize.BOOLEAN
 }, {
     sequelize
 });
@@ -156,7 +157,7 @@ app.use(session({
     cookie: {
         httpOnly: true,
         path: '/',
-        secure:false,
+        secure: false,
         sameSite: 'lax'
     }
 }));
@@ -235,10 +236,10 @@ app.use((req, res, next) => {
         if (req.session.user) {
             user.findOne({ where: { id: req.session.user.id } }).then(u => {
                 if (u === null || u.staff === '') {
-                    res.status(403).render(`${__dirname}/views/err404.html`, {statuscode: res.statusCode});
+                    res.status(403).render(`${__dirname}/views/err404.html`, { statuscode: res.statusCode });
                 } else next();
             });
-        } else res.status(403).render(`${__dirname}/views/err404.html`, {statuscode: res.statusCode});
+        } else res.status(403).render(`${__dirname}/views/err404.html`, { statuscode: res.statusCode });
     } else next();
 })
 app.get('/api/users/', (req, res) => {
@@ -281,7 +282,7 @@ app.get('/api/users/', (req, res) => {
 app.get('/api/brew-coffee/', (req, res) => {
     let ran = random(10000, 30000);
     setTimeout(() => {
-        res.status(418).json({error: 'I\'m a teapot.', body: 'The requested entitiy body is short and stout.', addInfo: 'Tip me over and pour me out.'});
+        res.status(418).json({ error: 'I\'m a teapot.', body: 'The requested entitiy body is short and stout.', addInfo: 'Tip me over and pour me out.' });
     }, ran);
 });
 app.get('/api/user/', (req, res) => {
@@ -538,7 +539,7 @@ app.patch('/api/user/unban/', (req, res) => {
                     return;
                 }
                 user.findOne({ where: { id } }).then(usr => {
-                    usr.update({ bannedAt: null}).then(() => {
+                    usr.update({ bannedAt: null }).then(() => {
                         res.sendStatus(204);
                     }, err => {
                         res.status(500).json({ error: 'Internal server error.' });
@@ -829,29 +830,33 @@ app.patch('/api/user/domain/', (req, res) => {
             }
         }).then(d => {
             if (d !== null) {
-                user.findOne({
-                    where: {
-                        id: req.session.user.id
-                    }
-                }).then(u => {
-                    if (u !== null) {
-                        u.update({
-                            domain,
-                            subdomain
-                        }).then(u => {
-                            req.session.user = u;
-                            res.status(200).json({
+                if (d.allowsSubdomains ? true : (subdomain === undefined || subdomain === '')) {
+                    user.findOne({
+                        where: {
+                            id: req.session.user.id
+                        }
+                    }).then(u => {
+                        if (u !== null) {
+                            u.update({
                                 domain,
                                 subdomain
+                            }).then(u => {
+                                req.session.user = u;
+                                res.status(200).json({
+                                    domain,
+                                    subdomain
+                                });
                             });
-                        });
-                    }
-                }).catch(err => {
-                    res.sendStatus(500);
-                    console.error(error);
-                });
+                        }
+                    }).catch(err => {
+                        res.sendStatus(500);
+                        console.error(error);
+                    });
+                } else {
+                    res.sendStatus(400);
+                }
             } else {
-                res.sendStatus(400);
+                res.sendStatus(404);
             }
         }).catch(err => {
             res.sendStatus(500);
@@ -1130,7 +1135,7 @@ app.post('/upload/', upload.single('file'), (req, res) => {
     }
 });
 app.use(express.static('root', { acceptRanges: false }), (req, res, next) => {
-    res.status(404).render(`${__dirname}/views/err404.html`, {statuscode: res.statusCode});
+    res.status(404).render(`${__dirname}/views/err404.html`, { statuscode: res.statusCode });
 });
 
 server.listen(port);
