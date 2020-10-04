@@ -88,6 +88,8 @@
                     }).then(res => res.json()).then(js => {
                         domain.value = js.domain;
                         subdomain.value = js.subdomain;
+                        subdomain.title = json.find(a => a.domain === domain.value).allowsSubdomains ? '' : 'This domain doesn\'t support subdomains, there\'s a fix on the way to patch that, but until then, sorry!';
+                        subdomain.disabled = !json.find(a => a.domain === domain.value).allowsSubdomains;
                     });
                     domain.addEventListener('change', e => {
                         subdomain.value = json.find(a => a.domain === e.target.value).allowsSubdomains ? subdomain.value : '';
