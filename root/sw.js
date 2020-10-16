@@ -44,18 +44,6 @@ self.addEventListener('install', function (event) {
     );
 });
 
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(keys => Promise.all(
-            keys.map(key => {
-                if (!expectedCaches.includes(key)) {
-                    return caches.delete(key);
-                }
-            })
-        ))
-    );
-});
-
 self.addEventListener('fetch', function (event) {
     if (event.request.method === 'POST' && event.request.url.includes('/me/upload/')) {
         event.respondWith((async () => {
